@@ -11,11 +11,6 @@ headers = {
 
 st.set_page_config(page_title="AI Study Buddy", page_icon="📚", layout="wide")
 
-with open("voice_helper.html", "r") as f:
-    voice_js = f.read()
-
-st.components.v1.html(voice_js, height=0)
-
 st.markdown("""
 <style>
     .stApp {
@@ -76,18 +71,10 @@ st.markdown("""
 
 if "chat" not in st.session_state:
     st.session_state.chat = []
-if "last_answer" not in st.session_state:
-    st.session_state.last_answer = ""
 
 with st.sidebar:
     st.markdown("### ⚙️ Settings")
     mode = st.selectbox("Select Mode", ["Simple (Like I'm 5)", "Normal", "Detailed"])
-    
-    st.markdown("---")
-    voice_enabled = st.checkbox("🔊 Voice Output", value=False)
-    
-    if voice_enabled and st.session_state.last_answer:
-        st.markdown(f'<button onclick="speak(`{st.session_state.last_answer}`)">🔊 Speak Last Answer</button>', unsafe_allow_html=True)
     
     st.markdown("---")
     st.markdown("### 📚 Quick Topics")
@@ -97,13 +84,29 @@ with st.sidebar:
     for i, topic in enumerate(topics):
         with cols[i % 2]:
             if st.button(topic, use_container_width=True):
-                st.session_state.chat.append({"q": topic, "a": "🤔 Loading..."})
-                st.rerun()
+                with st.spinner("Loading..."):
+                    if mode == "Simple (Like I'm 5)":
+                        prompt = "Explain like the student is 5 years old. Very simple words."
+                    elif mode == "Detailed":
+                        prompt = "Explain in detail with examples."
+                    else:
+                        prompt = "Explain clearly and simply."
+                    
+                    data = {
+                        "model": "mistral-small-latest",
+                        "messages": [
+                            {"role": "system", "content": prompt},
+                            {"role": "user", "content": f"Explain {topic.replace('🐍', '').replace('🤖', '').strip()} in simple words"}
+                        ]
+                    }
+                    response = requests.post(url, json=data, headers=headers)
+                    answer = response.json()["choices"][0]["message"]["content"]
+                    st.session_state.chat.append({"q": f"Tell me about {topic}", "a": answer})
+                    st.rerun()
     
     st.markdown("---")
     if st.button("🗑️ Clear Chat", use_container_width=True):
         st.session_state.chat = []
-        st.session_state.last_answer = ""
         st.rerun()
 
 st.markdown("### 💬 Ask your question")
@@ -128,15 +131,13 @@ if st.button("🚀 Ask AI", use_container_width=True) and user_input:
         response = requests.post(url, json=data, headers=headers)
         answer = response.json()["choices"][0]["message"]["content"]
         st.session_state.chat.append({"q": user_input, "a": answer})
-        st.session_state.last_answer = answer
-        
-        if voice_enabled:
-            st.markdown(f'<script>speak("{answer.replace('"', '\\"').replace('\n', ' ')}")</script>', unsafe_allow_html=True)
-        
         st.rerun()
 
 st.markdown("---")
 st.markdown("### 💬 Conversation")
+
+if len(st.session_state.chat) == 0:
+    st.info("No messages yet. Ask me something!")
 
 for item in reversed(st.session_state.chat):
     st.markdown(f'<div class="user-msg"><strong>🧑‍🎓 You:</strong><br>{item["q"]}</div>', unsafe_allow_html=True)
