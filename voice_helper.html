@@ -1,0 +1,8 @@
+<script>
+function speak(text) {
+    var msg = new SpeechSynthesisUtterance(text);
+    msg.lang = 'en-US';
+    msg.rate = 0.9;
+    window.speechSynthesis.speak(msg);
+}
+</script>

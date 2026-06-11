@@ -11,6 +11,11 @@ headers = {
 
 st.set_page_config(page_title="AI Study Buddy", page_icon="📚", layout="wide")
 
+with open("voice_helper.html", "r") as f:
+    voice_js = f.read()
+
+st.components.v1.html(voice_js, height=0)
+
 st.markdown("""
 <style>
     .stApp {
@@ -60,21 +65,6 @@ st.markdown("""
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 </style>
-
-<script>
-    function speakText(text) {
-        if ('speechSynthesis' in window) {
-            var utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US';
-            utterance.rate = 0.9;
-            utterance.pitch = 1;
-            window.speechSynthesis.cancel();
-            window.speechSynthesis.speak(utterance);
-        } else {
-            console.log("Speech synthesis not supported");
-        }
-    }
-</script>
 """, unsafe_allow_html=True)
 
 st.markdown("""
@@ -86,6 +76,8 @@ st.markdown("""
 
 if "chat" not in st.session_state:
     st.session_state.chat = []
+if "last_answer" not in st.session_state:
+    st.session_state.last_answer = ""
 
 with st.sidebar:
     st.markdown("### ⚙️ Settings")
@@ -93,6 +85,9 @@ with st.sidebar:
     
     st.markdown("---")
     voice_enabled = st.checkbox("🔊 Voice Output", value=False)
+    
+    if voice_enabled and st.session_state.last_answer:
+        st.markdown(f'<button onclick="speak(`{st.session_state.last_answer}`)">🔊 Speak Last Answer</button>', unsafe_allow_html=True)
     
     st.markdown("---")
     st.markdown("### 📚 Quick Topics")
@@ -108,6 +103,7 @@ with st.sidebar:
     st.markdown("---")
     if st.button("🗑️ Clear Chat", use_container_width=True):
         st.session_state.chat = []
+        st.session_state.last_answer = ""
         st.rerun()
 
 st.markdown("### 💬 Ask your question")
@@ -132,10 +128,10 @@ if st.button("🚀 Ask AI", use_container_width=True) and user_input:
         response = requests.post(url, json=data, headers=headers)
         answer = response.json()["choices"][0]["message"]["content"]
         st.session_state.chat.append({"q": user_input, "a": answer})
+        st.session_state.last_answer = answer
         
         if voice_enabled:
-            # JavaScript for voice
-            st.markdown(f'<script>speakText({repr(answer)})</script>', unsafe_allow_html=True)
+            st.markdown(f'<script>speak("{answer.replace('"', '\\"').replace('\n', ' ')}")</script>', unsafe_allow_html=True)
         
         st.rerun()
 
