@@ -362,4 +362,4 @@ with col2:
             st.session_state.chat.append({"q": f"Tell me about {rand_topic}", "a": answer, "time": datetime.now().strftime("%H:%M")})
             st.rerun()
 
-st.markdown('<div class="footer">✨ Made with Mistral AI — Learn something new today</div>', unsafe_allow_html=True)
+st.markdown('<div class="footer">✨ Made with Nirbhay </div>', unsafe_allow_html=True)

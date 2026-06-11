@@ -200,10 +200,30 @@ for n in range(1, 100):
 print("total sum is :", total)
 
 
-
+# Simple function #
 def my_name():
    print ("NB")
 
 my_name()
+
+# Function with parameter #
+def square(num):
+    print(num * num)
+
+square(5)  # 25
+square(4)  # 16
+
+# Function with return #
+def square(num):
+    return num * num
+
+result = square(8)
+print(result) 
+
+# Two parameters #
+def multiply(a, b):
+    return a * b
+
+print(multiply(4, 5))  # 20
 
 
