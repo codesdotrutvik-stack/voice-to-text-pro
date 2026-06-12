@@ -36,12 +36,6 @@ st.markdown("""
         width: 100%;
     }
     
-    .stButton button:hover {
-        opacity: 0.9;
-        transform: translateY(-1px);
-        transition: all 0.2s;
-    }
-    
     .api-success {
         background: #d1fae5;
         color: #065f46;
@@ -79,6 +73,25 @@ st.markdown("""
         font-size: 0.7rem;
         font-weight: 500;
     }
+    
+    .role-chip {
+        display: inline-block;
+        background: #f1f5f9;
+        color: #1e293b;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin: 0.2rem;
+        cursor: pointer;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s;
+    }
+    .role-chip:hover {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -97,6 +110,15 @@ ADZUNA_API_KEY = "9c920a8f1b37a639553a98541e0ba2e8"
 MISTRAL_API_KEY = "tXPmUYPeEqwD48MrvREFmn3GmvB7KqRk"
 
 CITIES = ["All", "Ahmedabad", "Surat", "Rajkot", "Vadodara", "Bangalore", "Mumbai", "Hyderabad"]
+
+POPULAR_ROLES = [
+    "Python Developer", "Shopify Developer", "Frontend Developer", 
+    "WordPress Developer", "Full Stack Developer", "Data Scientist",
+    "React Developer", "Java Developer", "DevOps Engineer"
+]
+
+DEFAULT_ROLE = "Python Developer"
+DEFAULT_CITY = "Surat"
 
 # ============================================================
 # PERMANENT STORAGE
@@ -127,7 +149,7 @@ def fetch_jobs(role, location):
     params = {
         "app_id": ADZUNA_APP_ID,
         "app_key": ADZUNA_API_KEY,
-        "results_per_page": 15,
+        "results_per_page": 12,
         "what": role,
         "where": location_name,
         "sort_by": "date"
@@ -209,9 +231,9 @@ if "searched" not in st.session_state:
 if "company_details" not in st.session_state:
     st.session_state.company_details = {}
 if "search_role" not in st.session_state:
-    st.session_state.search_role = "Python Developer"
+    st.session_state.search_role = DEFAULT_ROLE
 if "search_city" not in st.session_state:
-    st.session_state.search_city = "All"
+    st.session_state.search_city = DEFAULT_CITY
 
 # ============================================================
 # SIDEBAR
@@ -234,6 +256,15 @@ with st.sidebar:
     search_clicked = st.button("🔍 Search Jobs", use_container_width=True, type="primary")
     
     st.markdown("---")
+    
+    st.markdown("### 📌 Quick Filters")
+    
+    for role in POPULAR_ROLES[:5]:
+        if st.button(role, key=f"quick_{role}", use_container_width=True):
+            st.session_state.search_role = role
+            st.rerun()
+    
+    st.markdown("---")
     st.success("✅ API Active")
     
     st.markdown("---")
@@ -244,6 +275,18 @@ with st.sidebar:
         st.session_state.saved_jobs = []
         save_saved_jobs([])
         st.rerun()
+
+# ============================================================
+# LOAD DEFAULT JOBS ON STARTUP
+# ============================================================
+if not st.session_state.searched and not st.session_state.jobs:
+    with st.spinner(f"Loading default jobs for {DEFAULT_ROLE} in {DEFAULT_CITY}..."):
+        default_jobs, error = fetch_jobs(DEFAULT_ROLE, DEFAULT_CITY)
+        if default_jobs:
+            st.session_state.jobs = default_jobs
+            st.session_state.searched = True
+            st.session_state.search_role = DEFAULT_ROLE
+            st.session_state.search_city = DEFAULT_CITY
 
 # ============================================================
 # SEARCH LOGIC
@@ -364,4 +407,4 @@ if st.session_state.saved_jobs:
 # FOOTER
 # ============================================================
 st.markdown("---")
-st.caption("💼 Job Finder AI | Powered by Adzuna API + Mistral AI | Jobs data is live")
+st.caption("💼 Job Finder AI | Powered by NB | jobs from, India")
