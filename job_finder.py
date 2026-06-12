@@ -74,8 +74,8 @@ st.markdown("""
         font-weight: 500;
     }
     
-    /* Only Floating Chat Button - No other buttons */
-    .chat-float-btn {
+    /* Floating Button */
+    .float-chat {
         position: fixed;
         bottom: 25px;
         right: 25px;
@@ -89,15 +89,14 @@ st.markdown("""
         cursor: pointer;
         box-shadow: 0 4px 15px rgba(0,0,0,0.25);
         z-index: 999;
-        transition: all 0.3s;
         font-size: 28px;
-        border: none;
+        transition: all 0.3s;
     }
-    .chat-float-btn:hover {
+    .float-chat:hover {
         transform: scale(1.08);
     }
     
-    /* Chat Popup - Hidden by default */
+    /* Chat Popup */
     .chat-popup {
         position: fixed;
         bottom: 100px;
@@ -108,15 +107,12 @@ st.markdown("""
         border-radius: 20px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         z-index: 1000;
-        display: none;
+        display: flex;
         flex-direction: column;
         overflow: hidden;
         border: 1px solid #e2e8f0;
     }
-    .chat-popup.show {
-        display: flex;
-    }
-    .chat-popup-header {
+    .chat-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         padding: 15px;
@@ -124,7 +120,7 @@ st.markdown("""
         justify-content: space-between;
         align-items: center;
     }
-    .chat-popup-close {
+    .chat-close {
         cursor: pointer;
         background: rgba(255,255,255,0.2);
         width: 28px;
@@ -186,14 +182,14 @@ st.markdown("""
         color: #94a3b8;
         margin-top: 4px;
     }
-    .chat-input {
+    .chat-input-area {
         padding: 12px;
         background: white;
         border-top: 1px solid #e2e8f0;
         display: flex;
         gap: 8px;
     }
-    .chat-input input {
+    .chat-input-area input {
         flex: 1;
         padding: 10px 14px;
         border: 1px solid #e2e8f0;
@@ -201,7 +197,7 @@ st.markdown("""
         outline: none;
         font-size: 13px;
     }
-    .chat-input button {
+    .chat-input-area button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border: none;
@@ -370,8 +366,8 @@ if "search_role" not in st.session_state:
     st.session_state.search_role = DEFAULT_ROLE
 if "search_city" not in st.session_state:
     st.session_state.search_city = DEFAULT_CITY
-if "chat_open" not in st.session_state:
-    st.session_state.chat_open = False
+if "show_chat" not in st.session_state:
+    st.session_state.show_chat = False
 if "chat_messages" not in st.session_state:
     st.session_state.chat_messages = []
 
@@ -541,105 +537,99 @@ if st.session_state.saved_jobs:
                     st.rerun()
 
 # ============================================================
-# CHATBOT - ONLY FLOATING BUTTON (NO SECONDARY BUTTON)
+# CHATBOT - SIMPLE WORKING (CLICK TO OPEN)
 # ============================================================
 
-# Floating Button (Only one)
+# Floating Button
 st.markdown("""
-<div class="chat-float-btn" id="chatFloatBtn">
+<div class="float-chat" onclick="document.querySelector('button[key=\\'open_chat\\']').click()">
     💬
 </div>
-
-<script>
-    const chatFloatBtn = document.getElementById('chatFloatBtn');
-    const chatPopup = document.getElementById('chatPopup');
-    let isChatOpen = false;
-    
-    chatFloatBtn.addEventListener('click', function() {
-        if (!chatPopup) {
-            // Create popup
-            const popup = document.createElement('div');
-            popup.id = 'chatPopup';
-            popup.className = 'chat-popup show';
-            popup.innerHTML = `
-                <div class="chat-popup-header">
-                    <span>🤖 JobBot Assistant</span>
-                    <div class="chat-popup-close" id="closeChatBtn">✕</div>
-                </div>
-                <div class="chat-messages" id="chatMessages">
-                    <div class="bot-msg">
-                        <div class="bot-icon">🤖</div>
-                        <div class="bot-text">👋 Hi! I'm JobBot. Ask me about jobs, companies, or career advice!</div>
-                    </div>
-                </div>
-                <div class="chat-input">
-                    <input type="text" id="chatInput" placeholder="Type a message..." />
-                    <button id="sendMsgBtn">Send</button>
-                </div>
-            `;
-            document.body.appendChild(popup);
-            
-            document.getElementById('closeChatBtn').addEventListener('click', function() {
-                popup.remove();
-                isChatOpen = false;
-            });
-            
-            document.getElementById('sendMsgBtn').addEventListener('click', function() {
-                const input = document.getElementById('chatInput');
-                const message = input.value;
-                if (message.trim()) {
-                    // Add user message to chat
-                    const messagesDiv = document.getElementById('chatMessages');
-                    const time = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-                    messagesDiv.innerHTML += `
-                        <div class="user-msg">
-                            <div class="user-text">${escapeHtml(message)}</div>
-                        </div>
-                        <div class="msg-time" style="text-align: right;">${time}</div>
-                    `;
-                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                    input.value = '';
-                    
-                    // Send to backend
-                    fetch('/_stcore/chat', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({message: message})
-                    }).then(response => response.json()).then(data => {
-                        messagesDiv.innerHTML += `
-                            <div class="bot-msg">
-                                <div class="bot-icon">🤖</div>
-                                <div class="bot-text">${escapeHtml(data.response)}</div>
-                            </div>
-                            <div class="msg-time" style="margin-left: 40px;">${time}</div>
-                        `;
-                        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                    });
-                }
-            });
-            
-            document.getElementById('chatInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') document.getElementById('sendMsgBtn').click();
-            });
-            
-            isChatOpen = true;
-        } else {
-            chatPopup.remove();
-            isChatOpen = false;
-        }
-    });
-    
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-</script>
 """, unsafe_allow_html=True)
 
-# Hidden backend endpoint (not visible)
-if st.button("", key="hidden_backend", help="", disabled=True, use_container_width=False):
-    pass
+# Hidden button - this will be triggered by the circle
+if st.button("", key="open_chat"):
+    st.session_state.show_chat = not st.session_state.show_chat
+    if st.session_state.show_chat and not st.session_state.chat_messages:
+        st.session_state.chat_messages = [
+            {"role": "bot", "content": "👋 Hi! I'm JobBot. Ask me about jobs, companies, or career advice!", "time": datetime.now().strftime("%I:%M %p")}
+        ]
+    st.rerun()
+
+# Chat Popup
+if st.session_state.show_chat:
+    st.markdown("""
+    <div class="chat-popup">
+        <div class="chat-header">
+            <span>🤖 JobBot Assistant</span>
+            <div class="chat-close" onclick="document.querySelector('button[key=\\'close_chat\\']').click()">✕</div>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+    """, unsafe_allow_html=True)
+    
+    # Display messages
+    for msg in st.session_state.chat_messages:
+        if msg["role"] == "user":
+            st.markdown(f"""
+            <div class="user-msg">
+                <div class="user-text">{msg['content']}</div>
+            </div>
+            <div class="msg-time" style="text-align: right;">{msg.get('time', '')}</div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown(f"""
+            <div class="bot-msg">
+                <div class="bot-icon">🤖</div>
+                <div class="bot-text">{msg['content']}</div>
+            </div>
+            <div class="msg-time" style="margin-left: 40px;">{msg.get('time', '')}</div>
+            """, unsafe_allow_html=True)
+    
+    st.markdown("""
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Type a message..." />
+            <button id="sendBtn">Send</button>
+        </div>
+    </div>
+    
+    <script>
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value;
+            if (message.trim()) {
+                const streamlitInput = document.querySelector('input[data-testid="stTextInput"][aria-label="chat_hidden_input"]');
+                const streamlitBtn = document.querySelector('button[key="send_message"]');
+                if (streamlitInput && streamlitBtn) {
+                    streamlitInput.value = message;
+                    streamlitBtn.click();
+                }
+                input.value = '';
+            }
+        }
+        
+        document.getElementById('sendBtn').addEventListener('click', sendMessage);
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+    """, unsafe_allow_html=True)
+    
+    # Hidden inputs
+    chat_hidden = st.text_input("", key="chat_hidden_input", label_visibility="collapsed")
+    
+    if st.button("", key="send_message"):
+        if chat_hidden:
+            current_time = datetime.now().strftime("%I:%M %p")
+            st.session_state.chat_messages.append({"role": "user", "content": chat_hidden, "time": current_time})
+            with st.spinner(""):
+                response = chat_with_ai(chat_hidden)
+                st.session_state.chat_messages.append({"role": "bot", "content": response, "time": datetime.now().strftime("%I:%M %p")})
+            st.rerun()
+    
+    if st.button("", key="close_chat"):
+        st.session_state.show_chat = False
+        st.rerun()
 
 # ============================================================
 # FOOTER
