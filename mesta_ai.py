@@ -147,8 +147,6 @@ if "output_mode" not in st.session_state:
     st.session_state.output_mode = "text"
 if "voice_type" not in st.session_state:
     st.session_state.voice_type = "man"
-if "stop_voice" not in st.session_state:
-    st.session_state.stop_voice = False
 
 # HEADER
 st.markdown("""
@@ -215,17 +213,6 @@ body { margin:0; background:transparent; display:flex; flex-direction:column; al
 .bar.idle:nth-child(11) { animation-delay:0.25s }
 .bar.idle:nth-child(12) { animation-delay:0.35s }
 </style>
-<script>
-function stopSpeaking() {
-    if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-    }
-    var iframes = window.parent.document.querySelectorAll('iframe');
-    iframes.forEach(function(f) {
-        try { f.contentWindow.postMessage({type: 'mesta_stop'}, '*'); } catch(e) {}
-    });
-}
-</script>
 </head>
 <body>
 <div class="wave-wrap" id="wave">
@@ -291,7 +278,7 @@ window.mestaStopSpeak  = stopSpeak;
 </html>
 """, height=100)
 
-# TTS FUNCTION with stop support
+# TTS FUNCTION
 def speak_text(text, voice_type="man"):
     safe = text.replace("'", "\\'").replace("\n", " ").replace('"', '\\"')
 
@@ -319,16 +306,6 @@ def speak_text(text, voice_type="man"):
     return f"""
     <script>
     (function() {{
-        var isStopped = false;
-        
-        window.stopCurrentSpeech = function() {{
-            isStopped = true;
-            if (window.speechSynthesis) {{
-                window.speechSynthesis.cancel();
-            }}
-            triggerWave('mesta_stop');
-        }};
-        
         function triggerWave(type) {{
             try {{
                 var iframes = window.parent.document.querySelectorAll('iframe');
@@ -339,7 +316,6 @@ def speak_text(text, voice_type="man"):
         }}
 
         function doSpeak() {{
-            if (isStopped) return;
             var allVoices = window.speechSynthesis.getVoices();
             if (!allVoices || allVoices.length === 0) {{
                 setTimeout(doSpeak, 200);
@@ -353,15 +329,9 @@ def speak_text(text, voice_type="man"):
             {voice_filter}
             if (v) msg.voice = v;
 
-            msg.onstart = function() {{ 
-                if (isStopped) {{
-                    window.speechSynthesis.cancel();
-                    return;
-                }}
-                triggerWave('mesta_speak'); 
-            }};
-            msg.onend   = function() {{ triggerWave('mesta_stop'); }};
-            msg.onerror = function() {{ triggerWave('mesta_stop'); }};
+            msg.onstart = function() {{ triggerWave('mesta_speak'); }};
+            msg.onend   = function() {{ triggerWave('mesta_stop');  }};
+            msg.onerror = function() {{ triggerWave('mesta_stop');  }};
 
             window.speechSynthesis.speak(msg);
         }}
@@ -375,7 +345,7 @@ def speak_text(text, voice_type="man"):
     </script>
     """
 
-# API
+# API - UPDATED with INCREASED max_tokens
 def ask_mistral(question):
     headers = {"Authorization": f"Bearer {MISTRAL_API_KEY}", "Content-Type": "application/json"}
     data = {
@@ -398,7 +368,7 @@ For Shopify hero banner, provide complete section.liquid file with:
 - Don't say "truncated" or "etc" - give actual code"""},
             {"role": "user", "content": question}
         ],
-        "max_tokens": 2500
+        "max_tokens": 2500  # INCREASED for longer responses
     }
     try:
         r = requests.post(MISTRAL_URL, json=data, headers=headers, timeout=30)
@@ -413,7 +383,7 @@ if st.session_state.pending_audio:
 
 # RESPONSE MODE
 st.markdown('<div class="section-label">⚙ Response Mode</div>', unsafe_allow_html=True)
-c1, c2, c3 = st.columns([1, 1, 3])
+c1, c2, csp = st.columns([1, 1, 4])
 with c1:
     if st.button("Text" if st.session_state.output_mode=="text" else "📝 Text",
                  use_container_width=True,
@@ -430,7 +400,7 @@ with c2:
 # VOICE TYPE
 if st.session_state.output_mode == "voice":
     st.markdown('<div class="section-label">🎙 Voice Type</div>', unsafe_allow_html=True)
-    v1, v2, v3, v4 = st.columns([1, 1, 1, 2])
+    v1, v2, v3, vsp = st.columns([1, 1, 1, 3])
     with v1:
         if st.button("👨 Man" if st.session_state.voice_type=="man" else "👨 Man",
                      use_container_width=True,
@@ -446,11 +416,6 @@ if st.session_state.output_mode == "voice":
                      use_container_width=True,
                      type="primary" if st.session_state.voice_type=="realistic" else "secondary"):
             st.session_state.voice_type = "realistic"; st.rerun()
-    with v4:
-        if st.button("⏹️ Stop Voice", use_container_width=True, type="secondary"):
-            st.markdown('<script>if(window.stopCurrentSpeech) window.stopCurrentSpeech();</script>', unsafe_allow_html=True)
-            st.success("Voice stopped!")
-    
     labels = {"man":"👨 Deep male voice", "woman":"👩 Female voice", "realistic":"🎭 Most natural available"}
     st.markdown(f'<div class="mode-indicator">{labels[st.session_state.voice_type]}</div>', unsafe_allow_html=True)
 else:
