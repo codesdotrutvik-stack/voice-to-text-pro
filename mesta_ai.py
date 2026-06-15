@@ -345,19 +345,33 @@ def speak_text(text, voice_type="man"):
     </script>
     """
 
-# API
+# API - UPDATED with INCREASED max_tokens
 def ask_mistral(question):
     headers = {"Authorization": f"Bearer {MISTRAL_API_KEY}", "Content-Type": "application/json"}
     data = {
         "model": "mistral-small-latest",
         "messages": [
-            {"role": "system", "content": "You are Mesta AI, a helpful assistant. When asked for code, provide COMPLETE working code with all details. For Shopify hero banner, provide full Liquid code, full Schema, full CSS. Don't shorten or summarize. Give at least 30-40 lines of complete code."},
+            {"role": "system", "content": """You are Mesta AI, a coding expert assistant.
+
+IMPORTANT RULES:
+1. When asked for code, provide COMPLETE working code
+2. NEVER summarize or shorten code - give full implementation
+3. For Shopify sections, include: Liquid markup, full Schema, complete CSS
+4. Code should be copy-paste ready and fully functional
+5. Minimum 40-50 lines for complex requests
+6. Include detailed comments
+
+For Shopify hero banner, provide complete section.liquid file with:
+- Full Liquid code with all HTML structure
+- Complete schema with image, title, subtitle, button settings
+- Full CSS styling (desktop + mobile responsive)
+- Don't say "truncated" or "etc" - give actual code"""},
             {"role": "user", "content": question}
         ],
-        "max_tokens": 200
+        "max_tokens": 2500  # INCREASED for longer responses
     }
     try:
-        r = requests.post(MISTRAL_URL, json=data, headers=headers, timeout=15)
+        r = requests.post(MISTRAL_URL, json=data, headers=headers, timeout=30)
         return r.json()["choices"][0]["message"]["content"]
     except Exception as e:
         return f"Connection issue: {str(e)}"
