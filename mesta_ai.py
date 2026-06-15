@@ -1,6 +1,9 @@
 import streamlit as st
 import requests
 from datetime import datetime
+import base64
+import tempfile
+import os
 
 st.set_page_config(page_title="Mesta AI", page_icon="✨", layout="wide")
 
@@ -149,6 +152,32 @@ MISTRAL_URL = "https://api.mistral.ai/v1/chat/completions"
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
+if "pending_audio" not in st.session_state:
+    st.session_state.pending_audio = None
+
+# ============================================================
+# TTS FUNCTION — uses browser Web Speech API (no library needed)
+# ============================================================
+def speak_text(text):
+    # Escape single quotes to avoid breaking JS string
+    safe_text = text.replace("'", "\\'").replace("\n", " ")
+    return f"""
+    <script>
+    (function() {{
+        try {{
+            window.speechSynthesis.cancel();
+            var msg = new SpeechSynthesisUtterance('{safe_text}');
+            msg.lang = 'en-US';
+            msg.rate = 1.0;
+            msg.pitch = 1.0;
+            msg.volume = 1.0;
+            window.speechSynthesis.speak(msg);
+        }} catch(e) {{
+            console.log('TTS error:', e);
+        }}
+    }})();
+    </script>
+    """
 
 # ============================================================
 # API FUNCTION
@@ -171,6 +200,13 @@ def ask_mistral(question):
         return response.json()["choices"][0]["message"]["content"]
     except Exception as e:
         return f"Connection issue: {str(e)}"
+
+# ============================================================
+# PLAY PENDING AUDIO (inject before any rerun wipes it)
+# ============================================================
+if st.session_state.pending_audio:
+    st.components.v1.html(st.session_state.pending_audio, height=0)
+    st.session_state.pending_audio = None
 
 # ============================================================
 # TEXT INPUT
@@ -196,10 +232,12 @@ if ask_clicked and user_question:
             "a": answer,
             "t": datetime.now().strftime("%I:%M %p")
         })
+        st.session_state.pending_audio = speak_text(answer)
         st.rerun()
 
 if clear_clicked:
     st.session_state.chat_history = []
+    st.session_state.pending_audio = None
     st.rerun()
 
 # ============================================================
@@ -221,6 +259,7 @@ for i, q in enumerate(quick_qs):
                     "a": answer,
                     "t": datetime.now().strftime("%I:%M %p")
                 })
+                st.session_state.pending_audio = speak_text(answer)
                 st.rerun()
 
 # ============================================================
