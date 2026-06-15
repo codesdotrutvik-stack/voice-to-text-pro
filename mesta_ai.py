@@ -1,8 +1,7 @@
 import streamlit as st
 import requests
 import time
-import pyttsx3
-import threading
+from datetime import datetime
 
 st.set_page_config(page_title="Mesta AI", page_icon="✨", layout="wide")
 
@@ -84,33 +83,6 @@ html, body, [class*="css"], .stApp {
     font-weight: 600;
 }
 
-/* Mode Toggle Buttons */
-.mode-toggle {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin: 1.5rem 0;
-}
-
-.mode-btn {
-    padding: 10px 30px;
-    border-radius: 50px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    border: none;
-    background: #f1f5f9;
-    color: #64748b;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-}
-
-.mode-btn-active {
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-    color: white;
-    box-shadow: 0 2px 10px rgba(139, 92, 246, 0.3);
-}
-
 /* Status */
 .status-box {
     text-align: center;
@@ -149,7 +121,7 @@ html, body, [class*="css"], .stApp {
     box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
 }
 
-/* Text Input - Fixed Border Issue */
+/* Text Input */
 .stTextInput > div > div > input {
     background: white !important;
     border: 1px solid #e2e8f0 !important;
@@ -385,20 +357,6 @@ with col2:
 # ============================================================
 # PROCESS QUESTION
 # ============================================================
-def speak_text(text):
-    def _speak():
-        try:
-            engine = pyttsx3.init()
-            engine.setProperty('rate', 160)
-            engine.setProperty('volume', 1)
-            engine.say(text)
-            engine.runAndWait()
-            engine.stop()
-        except:
-            pass
-    thread = threading.Thread(target=_speak)
-    thread.start()
-
 def ask_mistral(question):
     headers = {
         "Authorization": f"Bearer {MISTRAL_API_KEY}",
@@ -416,16 +374,19 @@ def ask_mistral(question):
     
     try:
         response = requests.post(MISTRAL_URL, json=data, headers=headers, timeout=15)
-        return response.json()["choices"][0]["message"]["content"]
+        answer = response.json()["choices"][0]["message"]["content"]
+        
+        # Speak using browser speech
+        safe_answer = answer.replace("'", "\\'").replace('"', '\\"').replace("\n", " ")
+        st.markdown(f'<script>speakAnswer("{safe_answer}");</script>', unsafe_allow_html=True)
+        return answer
     except:
         return "Sorry, I'm having trouble connecting. Please try again."
 
 if ask_clicked and user_question:
     with st.spinner("✨ Thinking..."):
         answer = ask_mistral(user_question)
-        st.session_state.chat_history.append({"q": user_question, "a": answer, "time": time.strftime("%I:%M %p")})
-        if st.session_state.mode == "voice":
-            speak_text(answer)
+        st.session_state.chat_history.append({"q": user_question, "a": answer, "time": datetime.now().strftime("%I:%M %p")})
         st.rerun()
 
 if clear_clicked:
@@ -445,9 +406,7 @@ for i, q in enumerate(quick_qs):
         if st.button(q, use_container_width=True):
             with st.spinner("✨ Thinking..."):
                 answer = ask_mistral(q)
-                st.session_state.chat_history.append({"q": q, "a": answer, "time": time.strftime("%I:%M %p")})
-                if st.session_state.mode == "voice":
-                    speak_text(answer)
+                st.session_state.chat_history.append({"q": q, "a": answer, "time": datetime.now().strftime("%I:%M %p")})
                 st.rerun()
 
 # ============================================================
@@ -465,4 +424,3 @@ if st.session_state.chat_history:
 # FOOTER
 # ============================================================
 st.markdown('<div class="footer">✨ Mesta AI · Created by Nirbhay · Powered by Mistral AI</div>', unsafe_allow_html=True)
-
