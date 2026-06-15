@@ -364,13 +364,13 @@ if st.session_state.pending_audio:
 st.markdown('<div class="section-label">⚙ Response Mode</div>', unsafe_allow_html=True)
 c1, c2, csp = st.columns([1, 1, 4])
 with c1:
-    if st.button("✅ Text" if st.session_state.output_mode=="text" else "📝 Text",
+    if st.button("Text" if st.session_state.output_mode=="text" else "📝 Text",
                  use_container_width=True,
                  type="primary" if st.session_state.output_mode=="text" else "secondary"):
         st.session_state.output_mode = "text"
         st.rerun()
 with c2:
-    if st.button("✅ Voice" if st.session_state.output_mode=="voice" else "🔊 Voice",
+    if st.button("Voice" if st.session_state.output_mode=="voice" else "🔊 Voice",
                  use_container_width=True,
                  type="primary" if st.session_state.output_mode=="voice" else "secondary"):
         st.session_state.output_mode = "voice"
@@ -381,17 +381,17 @@ if st.session_state.output_mode == "voice":
     st.markdown('<div class="section-label">🎙 Voice Type</div>', unsafe_allow_html=True)
     v1, v2, v3, vsp = st.columns([1, 1, 1, 3])
     with v1:
-        if st.button("✅ 👨 Man" if st.session_state.voice_type=="man" else "👨 Man",
+        if st.button("👨 Man" if st.session_state.voice_type=="man" else "👨 Man",
                      use_container_width=True,
                      type="primary" if st.session_state.voice_type=="man" else "secondary"):
             st.session_state.voice_type = "man"; st.rerun()
     with v2:
-        if st.button("✅ 👩 Woman" if st.session_state.voice_type=="woman" else "👩 Woman",
+        if st.button("👩 Woman" if st.session_state.voice_type=="woman" else "👩 Woman",
                      use_container_width=True,
                      type="primary" if st.session_state.voice_type=="woman" else "secondary"):
             st.session_state.voice_type = "woman"; st.rerun()
     with v3:
-        if st.button("✅ 🎭 Realistic" if st.session_state.voice_type=="realistic" else "🎭 Realistic",
+        if st.button("🎭 Realistic" if st.session_state.voice_type=="realistic" else "🎭 Realistic",
                      use_container_width=True,
                      type="primary" if st.session_state.voice_type=="realistic" else "secondary"):
             st.session_state.voice_type = "realistic"; st.rerun()
