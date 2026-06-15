@@ -38,7 +38,7 @@ html, body, [class*="css"], .stApp {
     padding: 4px 10px; border-radius: 20px; color: #64748b;
 }
 
-/* Input - NO WHITE BORDER */
+/* Input */
 .stTextInput > div > div > input {
     background: #12121e !important;
     border: 1px solid rgba(139,92,246,0.2) !important;
@@ -74,7 +74,7 @@ html, body, [class*="css"], .stApp {
     color: white !important;
 }
 
-/* Chat Bubbles - VISIBLE TEXT */
+/* Chat Bubbles */
 .user-bubble {
     background: linear-gradient(135deg, #7c3aed, #4f46e5);
     color: white;
@@ -110,7 +110,7 @@ html, body, [class*="css"], .stApp {
     margin-top: 4px;
 }
 
-/* Section Labels - VISIBLE */
+/* Section Labels */
 .section-label {
     font-size: 0.6rem;
     font-weight: 600;
@@ -123,11 +123,6 @@ html, body, [class*="css"], .stApp {
     height: 1px;
     background: rgba(255,255,255,0.05);
     margin: 1rem 0;
-}
-.mode-indicator {
-    font-size: 0.65rem;
-    color: #64748b;
-    margin-bottom: 0.5rem;
 }
 
 /* Footer */
@@ -154,14 +149,14 @@ function speakAnswer(text, voiceType) {
             msg.pitch = 0.8;
             msg.rate = 0.9;
             var maleVoice = voices.find(v => v.name.toLowerCase().includes('david') || 
-                                               v.name.toLowerCase().includes('google uk english male') ||
+                                               v.name.toLowerCase().includes('google') ||
                                                (v.lang === 'en-US' && v.name.toLowerCase().indexOf('female') === -1));
             if (maleVoice) msg.voice = maleVoice;
         } else if (voiceType === 'woman') {
             msg.pitch = 1.2;
             msg.rate = 1.0;
             var femaleVoice = voices.find(v => v.name.toLowerCase().includes('samantha') || 
-                                                 v.name.toLowerCase().includes('google uk english female') ||
+                                                 v.name.toLowerCase().includes('google') ||
                                                  v.name.toLowerCase().includes('female'));
             if (femaleVoice) msg.voice = femaleVoice;
         } else {
@@ -173,7 +168,14 @@ function speakAnswer(text, voiceType) {
         }
         
         window.speechSynthesis.speak(msg);
+    } else {
+        console.log("Speech synthesis not supported");
     }
+}
+
+// Load voices when page loads
+if (typeof window !== 'undefined') {
+    window.speechSynthesis.getVoices();
 }
 </script>
 """, unsafe_allow_html=True)
@@ -206,6 +208,8 @@ if "response_mode" not in st.session_state:
     st.session_state.response_mode = "voice"
 if "voice_type" not in st.session_state:
     st.session_state.voice_type = "woman"
+if "last_voice_spoken" not in st.session_state:
+    st.session_state.last_voice_spoken = ""
 
 # ============================================================
 # FUNCTIONS
@@ -240,7 +244,7 @@ with col2:
         st.rerun()
 
 # ============================================================
-# VOICE TYPE (Only when voice mode is active)
+# VOICE TYPE
 # ============================================================
 if st.session_state.response_mode == "voice":
     st.markdown('<div class="section-label">🎙 VOICE TYPE</div>', unsafe_allow_html=True)
@@ -289,6 +293,9 @@ for i, q in enumerate(quick_qs):
                     "mode": st.session_state.response_mode,
                     "voice": st.session_state.voice_type
                 })
+                if st.session_state.response_mode == "voice":
+                    safe_answer = answer.replace("'", "\\'").replace('"', '\\"').replace("\n", " ")
+                    st.markdown(f'<script>speakAnswer("{safe_answer}", "{st.session_state.voice_type}");</script>', unsafe_allow_html=True)
                 st.rerun()
 
 # ============================================================
@@ -315,6 +322,9 @@ if ask_clicked and user_question:
             "mode": st.session_state.response_mode,
             "voice": st.session_state.voice_type
         })
+        if st.session_state.response_mode == "voice":
+            safe_answer = answer.replace("'", "\\'").replace('"', '\\"').replace("\n", " ")
+            st.markdown(f'<script>speakAnswer("{safe_answer}", "{st.session_state.voice_type}");</script>', unsafe_allow_html=True)
         st.rerun()
 
 if clear_clicked:
@@ -329,9 +339,7 @@ if st.session_state.chat_history:
     st.markdown('<div class="section-label">💬 CONVERSATION</div>', unsafe_allow_html=True)
     
     for chat in reversed(st.session_state.chat_history[-15:]):
-        voice_icon = ""
-        if chat.get("mode") == "voice":
-            voice_icon = {"man": "👨", "woman": "👩", "realistic": "🎭"}.get(chat.get("voice"), "")
+        voice_icon = {"man": "👨", "woman": "👩", "realistic": "🎭"}.get(chat.get("voice"), "") if chat.get("mode") == "voice" else ""
         
         st.markdown(f'<div class="user-bubble"><strong>You</strong><br>{chat["q"]}</div>', unsafe_allow_html=True)
         
@@ -343,16 +351,6 @@ if st.session_state.chat_history:
             <div class="msg-time">{chat["t"]}</div>
         </div>
         ''', unsafe_allow_html=True)
-
-# ============================================================
-# VOICE OUTPUT AFTER DISPLAY
-# ============================================================
-if st.session_state.chat_history and st.session_state.chat_history[-1].get("mode") == "voice":
-    last_chat = st.session_state.chat_history[-1]
-    answer_text = last_chat["a"]
-    voice = last_chat.get("voice", "woman")
-    safe_answer = answer_text.replace("'", "\\'").replace('"', '\\"').replace("\n", " ")
-    st.markdown(f'<script>speakAnswer("{safe_answer}", "{voice}");</script>', unsafe_allow_html=True)
 
 # ============================================================
 # FOOTER
