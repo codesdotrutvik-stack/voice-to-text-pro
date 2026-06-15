@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 from datetime import datetime
 
-st.set_page_config(page_title="Mesta AI", page_icon="✨", layout="wide")
+st.set_page_config(page_title="Mesta AI", page_icon="✦", layout="wide")
 
 st.markdown("""
 <style>
@@ -12,24 +12,24 @@ st.markdown("""
 
 html, body, [class*="css"], .stApp {
     font-family: 'Inter', sans-serif !important;
-    background: #0a0b14 !important;
+    background: #07080f !important;
     color: #e2e8f0 !important;
 }
 
 #MainMenu, footer, header { visibility: hidden !important; display: none !important; }
 
 .block-container {
-    padding: 0 2rem 4rem !important;
-    max-width: 860px !important;
+    padding: 0 2.5rem 5rem !important;
+    max-width: 880px !important;
 }
 
-/* ── HEADER ── */
+/* HEADER */
 .mesta-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1.4rem 0 1.2rem 0;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
     margin-bottom: 0;
 }
 .header-left { display: flex; align-items: center; gap: 12px; }
@@ -38,11 +38,11 @@ html, body, [class*="css"], .stApp {
     background: linear-gradient(135deg, #a78bfa, #7c3aed);
     border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
+    box-shadow: 0 0 18px rgba(124,58,237,0.4);
 }
 .header-title { font-size: 1.1rem; font-weight: 700; color: #f1f5f9; }
-.header-sub { font-size: 0.68rem; color: #64748b; margin-top: 1px; }
-.header-right { display: flex; align-items: center; gap: 10px; }
+.header-sub { font-size: 0.67rem; color: #475569; margin-top: 1px; }
 .online-dot {
     width: 7px; height: 7px;
     background: #22c55e;
@@ -51,22 +51,21 @@ html, body, [class*="css"], .stApp {
     display: inline-block;
 }
 .model-badge {
-    font-size: 0.68rem;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.67rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.09);
     padding: 4px 12px;
     border-radius: 20px;
-    color: #94a3b8;
+    color: #64748b;
 }
 
-/* ── HERO SECTION ── */
+/* HERO */
 .hero {
     text-align: center;
-    padding: 2.8rem 0 2rem 0;
-    position: relative;
+    padding: 2.5rem 0 1.5rem 0;
 }
 .hero-greeting {
-    font-size: 2rem;
+    font-size: 2.1rem;
     font-weight: 700;
     background: linear-gradient(135deg, #a78bfa, #818cf8, #60a5fa);
     -webkit-background-clip: text;
@@ -74,81 +73,104 @@ html, body, [class*="css"], .stApp {
     background-clip: text;
     margin-bottom: 0.4rem;
 }
-.hero-sub {
-    font-size: 0.95rem;
-    color: #64748b;
-    margin-bottom: 2rem;
+.hero-sub { font-size: 0.9rem; color: #475569; margin-bottom: 1.5rem; }
+
+/* WAVE ANIMATION */
+.wave-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 60px;
+    margin: 0.5rem auto 1.5rem auto;
+    width: 200px;
+}
+.wave-bar {
+    width: 4px;
+    border-radius: 4px;
+    background: linear-gradient(to top, #7c3aed, #a78bfa);
+    animation: wave-idle 1.4s ease-in-out infinite;
+    height: 8px;
+}
+.wave-bar:nth-child(1)  { animation-delay: 0.0s; }
+.wave-bar:nth-child(2)  { animation-delay: 0.1s; }
+.wave-bar:nth-child(3)  { animation-delay: 0.2s; }
+.wave-bar:nth-child(4)  { animation-delay: 0.3s; }
+.wave-bar:nth-child(5)  { animation-delay: 0.4s; }
+.wave-bar:nth-child(6)  { animation-delay: 0.3s; }
+.wave-bar:nth-child(7)  { animation-delay: 0.2s; }
+.wave-bar:nth-child(8)  { animation-delay: 0.1s; }
+.wave-bar:nth-child(9)  { animation-delay: 0.0s; }
+.wave-bar:nth-child(10) { animation-delay: 0.15s; }
+.wave-bar:nth-child(11) { animation-delay: 0.25s; }
+.wave-bar:nth-child(12) { animation-delay: 0.35s; }
+
+@keyframes wave-idle {
+    0%, 100% { height: 8px;  opacity: 0.3; }
+    50%       { height: 14px; opacity: 0.6; }
 }
 
-/* ── MIC BUTTON AREA ── */
-.mic-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 2rem;
+.wave-container.speaking .wave-bar {
+    animation: wave-speak 0.6s ease-in-out infinite;
 }
-.mic-ring {
-    width: 90px; height: 90px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #7c3aed, #4f46e5);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 2rem;
-    box-shadow: 0 0 40px rgba(124,58,237,0.4), 0 0 80px rgba(124,58,237,0.15);
-    cursor: pointer;
-    transition: all 0.3s;
-    border: 3px solid rgba(167,139,250,0.3);
+.wave-container.speaking .wave-bar:nth-child(odd)  { animation-duration: 0.5s; }
+.wave-container.speaking .wave-bar:nth-child(even) { animation-duration: 0.7s; }
+.wave-container.speaking .wave-bar:nth-child(1)  { animation-delay: 0.0s; }
+.wave-container.speaking .wave-bar:nth-child(2)  { animation-delay: 0.05s; }
+.wave-container.speaking .wave-bar:nth-child(3)  { animation-delay: 0.1s; }
+.wave-container.speaking .wave-bar:nth-child(4)  { animation-delay: 0.15s; }
+.wave-container.speaking .wave-bar:nth-child(5)  { animation-delay: 0.2s; }
+.wave-container.speaking .wave-bar:nth-child(6)  { animation-delay: 0.15s; }
+.wave-container.speaking .wave-bar:nth-child(7)  { animation-delay: 0.1s; }
+.wave-container.speaking .wave-bar:nth-child(8)  { animation-delay: 0.05s; }
+.wave-container.speaking .wave-bar:nth-child(9)  { animation-delay: 0.0s; }
+.wave-container.speaking .wave-bar:nth-child(10) { animation-delay: 0.08s; }
+.wave-container.speaking .wave-bar:nth-child(11) { animation-delay: 0.12s; }
+.wave-container.speaking .wave-bar:nth-child(12) { animation-delay: 0.18s; }
+
+@keyframes wave-speak {
+    0%, 100% { height: 10px; }
+    50%       { height: 48px; }
 }
-.mic-label {
-    font-size: 0.78rem;
-    color: #64748b;
+
+.wave-status {
+    font-size: 0.72rem;
+    color: #475569;
+    text-align: center;
+    margin-top: -0.8rem;
+    margin-bottom: 1rem;
     letter-spacing: 0.5px;
 }
+.wave-status.active { color: #a78bfa; }
 
-/* ── WAVE SVG ── */
-.wave-wrap {
-    position: relative;
-    width: 100%;
-    height: 60px;
-    margin: -1rem 0 1rem 0;
-    opacity: 0.35;
-    overflow: hidden;
-}
-
-/* ── MODE TOGGLE ── */
-.mode-row {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 1.8rem;
-}
-
-/* ── INPUT BOX ── */
+/* INPUT — FULLY DARK */
 .stTextInput > div > div > input {
-    background: rgba(255,255,255,0.05) !important;
-    border: 1px solid rgba(255,255,255,0.1) !important;
+    background: #13141f !important;
+    border: 1px solid rgba(139,92,246,0.25) !important;
     border-radius: 50px !important;
     padding: 15px 24px !important;
     color: #f1f5f9 !important;
     font-size: 0.93rem !important;
     font-family: 'Inter', sans-serif !important;
     caret-color: #a78bfa !important;
+    -webkit-text-fill-color: #f1f5f9 !important;
 }
 .stTextInput > div > div > input::placeholder {
-    color: #334155 !important;
+    color: #2d3748 !important;
+    -webkit-text-fill-color: #2d3748 !important;
 }
 .stTextInput > div > div > input:focus {
-    border-color: rgba(139,92,246,0.6) !important;
+    border-color: rgba(139,92,246,0.55) !important;
     box-shadow: 0 0 0 3px rgba(139,92,246,0.1) !important;
+    background: #16172a !important;
     outline: none !important;
-    background: rgba(255,255,255,0.07) !important;
 }
 
-/* ── BUTTONS ── */
+/* BUTTONS */
 .stButton > button {
-    background: rgba(255,255,255,0.04) !important;
-    border: 1px solid rgba(255,255,255,0.09) !important;
-    color: #94a3b8 !important;
+    background: #13141f !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    color: #64748b !important;
     border-radius: 50px !important;
     padding: 9px 22px !important;
     font-size: 0.82rem !important;
@@ -156,43 +178,62 @@ html, body, [class*="css"], .stApp {
     transition: all 0.2s !important;
 }
 .stButton > button:hover {
-    background: rgba(255,255,255,0.08) !important;
+    background: #1e1f2e !important;
     color: #e2e8f0 !important;
+    border-color: rgba(255,255,255,0.15) !important;
 }
 .stButton > button[kind="primary"] {
     background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
     border: none !important;
     color: white !important;
-    box-shadow: 0 0 20px rgba(124,58,237,0.35) !important;
+    box-shadow: 0 0 22px rgba(124,58,237,0.35) !important;
 }
 .stButton > button[kind="primary"]:hover {
-    box-shadow: 0 0 30px rgba(124,58,237,0.55) !important;
+    box-shadow: 0 0 32px rgba(124,58,237,0.55) !important;
 }
 
-/* ── QUICK QUESTION CARDS ── */
-.qq-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 1.5rem;
+/* VOICE TYPE PILLS */
+.voice-pills {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 1.6rem;
+    flex-wrap: wrap;
 }
-.qq-card {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 14px;
-    padding: 14px 16px;
+.voice-pill {
+    padding: 7px 18px;
+    border-radius: 30px;
+    font-size: 0.78rem;
+    font-weight: 600;
     cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.09);
+    background: #13141f;
+    color: #64748b;
     transition: all 0.2s;
 }
-.qq-card:hover {
-    background: rgba(124,58,237,0.1);
-    border-color: rgba(139,92,246,0.3);
+.voice-pill.active {
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 0 16px rgba(124,58,237,0.35);
 }
-.qq-icon { font-size: 1rem; margin-bottom: 6px; }
-.qq-title { font-size: 0.82rem; font-weight: 600; color: #cbd5e1; margin-bottom: 2px; }
-.qq-sub { font-size: 0.7rem; color: #475569; }
 
-/* ── CHAT BUBBLES ── */
+/* QUICK QUESTIONS */
+.section-label {
+    font-size: 0.63rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #2d3748;
+    margin: 1.6rem 0 0.9rem 0;
+}
+.divider {
+    height: 1px;
+    background: rgba(255,255,255,0.04);
+    margin: 1.2rem 0;
+}
+
+/* CHAT BUBBLES */
 .user-bubble {
     background: linear-gradient(135deg, #7c3aed, #4f46e5);
     color: white;
@@ -207,8 +248,8 @@ html, body, [class*="css"], .stApp {
     box-shadow: 0 4px 20px rgba(124,58,237,0.2);
 }
 .ai-bubble {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: #13141f;
+    border: 1px solid rgba(255,255,255,0.07);
     color: #e2e8f0;
     padding: 13px 18px;
     border-radius: 20px 20px 20px 4px;
@@ -224,46 +265,27 @@ html, body, [class*="css"], .stApp {
     margin-bottom: 6px;
     display: flex; align-items: center; gap: 5px;
 }
-.msg-time { font-size: 0.6rem; color: #334155; margin-top: 6px; }
+.msg-time { font-size: 0.6rem; color: #2d3748; margin-top: 6px; }
 
-/* ── LABELS ── */
-.section-label {
-    font-size: 0.63rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: #334155;
-    margin: 1.6rem 0 0.8rem 0;
-}
-.divider {
-    height: 1px;
-    background: rgba(255,255,255,0.05);
-    margin: 1.2rem 0;
-}
-
-/* ── MODE INDICATOR ── */
+/* MODE INDICATOR */
 .mode-indicator {
     font-size: 0.72rem;
-    color: #475569;
+    color: #334155;
     margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 6px;
 }
 
-/* ── FOOTER ── */
+/* FOOTER */
 .footer {
     text-align: center;
     font-size: 0.6rem;
     color: #1e293b;
     padding: 2rem;
     margin-top: 2rem;
-    border-top: 1px solid rgba(255,255,255,0.04);
+    border-top: 1px solid rgba(255,255,255,0.03);
     letter-spacing: 1px;
     text-transform: uppercase;
 }
 
-/* ── SPINNER ── */
 .stSpinner > div { border-top-color: #7c3aed !important; }
 </style>
 """, unsafe_allow_html=True)
@@ -278,6 +300,8 @@ if "pending_audio" not in st.session_state:
     st.session_state.pending_audio = None
 if "output_mode" not in st.session_state:
     st.session_state.output_mode = "text"
+if "voice_type" not in st.session_state:
+    st.session_state.voice_type = "man"
 
 # ── HEADER ──
 st.markdown("""
@@ -285,49 +309,189 @@ st.markdown("""
     <div class="header-left">
         <div class="header-logo">✦</div>
         <div>
-            <div class="header-title">Mesta AI &nbsp;<span style="font-size:0.7rem;color:#7c3aed;">✔</span></div>
+            <div class="header-title">Mesta AI <span style="font-size:0.65rem;color:#7c3aed;">✔</span></div>
             <div class="header-sub">Intelligent Assistant</div>
         </div>
     </div>
-    <div class="header-right">
+    <div style="display:flex;align-items:center;gap:10px;">
         <span style="display:flex;align-items:center;gap:6px;">
             <span class="online-dot"></span>
-            <span style="font-size:0.68rem;color:#475569;">Online</span>
+            <span style="font-size:0.67rem;color:#334155;">Online</span>
         </span>
-        <span class="model-badge">Model: Mistral Small</span>
+        <span class="model-badge">Mistral Small</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# ── HERO ──
+# ── HERO + WAVE ──
 st.markdown("""
 <div class="hero">
     <div class="hero-greeting">Hello, Nirbhay! 👋</div>
     <div class="hero-sub">How can I help you today?</div>
-    <svg width="100%" height="55" viewBox="0 0 800 55" xmlns="http://www.w3.org/2000/svg" style="opacity:0.3;margin-bottom:0.5rem;">
-        <path d="M0,28 C80,5 160,50 240,28 C320,5 400,50 480,28 C560,5 640,50 720,28 C760,17 780,22 800,28" 
-              fill="none" stroke="#7c3aed" stroke-width="2"/>
-        <path d="M0,28 C100,10 200,46 300,28 C400,10 500,46 600,28 C700,10 760,38 800,28" 
-              fill="none" stroke="#4f46e5" stroke-width="1.5" stroke-dasharray="4,4"/>
-        <path d="M0,28 C60,18 120,38 200,28 C280,18 380,42 460,28 C540,14 660,40 800,28" 
-              fill="none" stroke="#a78bfa" stroke-width="1"/>
-    </svg>
 </div>
 """, unsafe_allow_html=True)
 
-# ── TTS FUNCTION ──
-def speak_text(text):
+# Wave animation — JS controls speaking class
+st.components.v1.html("""
+<div style="text-align:center;">
+    <div class="wave-container" id="waveEl">
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+    </div>
+    <div class="wave-status" id="waveStatus">Ready</div>
+</div>
+
+<style>
+.wave-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 60px;
+    margin: 0 auto;
+    width: 200px;
+}
+.wave-bar {
+    width: 4px;
+    border-radius: 4px;
+    background: linear-gradient(to top, #7c3aed, #a78bfa);
+    animation: wave-idle 1.4s ease-in-out infinite;
+    height: 8px;
+}
+.wave-bar:nth-child(1)  { animation-delay: 0.0s; }
+.wave-bar:nth-child(2)  { animation-delay: 0.1s; }
+.wave-bar:nth-child(3)  { animation-delay: 0.2s; }
+.wave-bar:nth-child(4)  { animation-delay: 0.3s; }
+.wave-bar:nth-child(5)  { animation-delay: 0.4s; }
+.wave-bar:nth-child(6)  { animation-delay: 0.3s; }
+.wave-bar:nth-child(7)  { animation-delay: 0.2s; }
+.wave-bar:nth-child(8)  { animation-delay: 0.1s; }
+.wave-bar:nth-child(9)  { animation-delay: 0.0s; }
+.wave-bar:nth-child(10) { animation-delay: 0.15s; }
+.wave-bar:nth-child(11) { animation-delay: 0.25s; }
+.wave-bar:nth-child(12) { animation-delay: 0.35s; }
+@keyframes wave-idle {
+    0%, 100% { height: 8px;  opacity: 0.3; }
+    50%       { height: 14px; opacity: 0.6; }
+}
+.wave-container.speaking .wave-bar {
+    animation: wave-speak 0.55s ease-in-out infinite;
+}
+.wave-container.speaking .wave-bar:nth-child(1)  { animation-delay: 0.00s; animation-duration: 0.45s; }
+.wave-container.speaking .wave-bar:nth-child(2)  { animation-delay: 0.05s; animation-duration: 0.55s; }
+.wave-container.speaking .wave-bar:nth-child(3)  { animation-delay: 0.10s; animation-duration: 0.40s; }
+.wave-container.speaking .wave-bar:nth-child(4)  { animation-delay: 0.15s; animation-duration: 0.65s; }
+.wave-container.speaking .wave-bar:nth-child(5)  { animation-delay: 0.20s; animation-duration: 0.50s; }
+.wave-container.speaking .wave-bar:nth-child(6)  { animation-delay: 0.15s; animation-duration: 0.60s; }
+.wave-container.speaking .wave-bar:nth-child(7)  { animation-delay: 0.10s; animation-duration: 0.45s; }
+.wave-container.speaking .wave-bar:nth-child(8)  { animation-delay: 0.05s; animation-duration: 0.55s; }
+.wave-container.speaking .wave-bar:nth-child(9)  { animation-delay: 0.00s; animation-duration: 0.40s; }
+.wave-container.speaking .wave-bar:nth-child(10) { animation-delay: 0.08s; animation-duration: 0.50s; }
+.wave-container.speaking .wave-bar:nth-child(11) { animation-delay: 0.12s; animation-duration: 0.65s; }
+.wave-container.speaking .wave-bar:nth-child(12) { animation-delay: 0.18s; animation-duration: 0.45s; }
+@keyframes wave-speak {
+    0%, 100% { height: 6px; }
+    50%       { height: 50px; }
+}
+.wave-status {
+    font-size: 0.72rem;
+    color: #475569;
+    margin-top: 6px;
+    letter-spacing: 0.5px;
+}
+.wave-status.active { color: #a78bfa; }
+</style>
+
+<script>
+window._mestaStartWave = function(text) {
+    var el = document.getElementById('waveEl');
+    var st = document.getElementById('waveStatus');
+    if (!el) return;
+    el.classList.add('speaking');
+    st.textContent = 'Speaking...';
+    st.classList.add('active');
+    var duration = Math.max(2000, text.length * 55);
+    setTimeout(function() {
+        el.classList.remove('speaking');
+        st.textContent = 'Ready';
+        st.classList.remove('active');
+    }, duration);
+};
+window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'mesta_speak') {
+        window._mestaStartWave(e.data.text || '');
+    }
+});
+</script>
+""", height=100)
+
+# ── TTS + WAVE ──
+def speak_text(text, voice_type="man"):
     safe = text.replace("'", "\\'").replace("\n", " ").replace('"', '\\"')
+    voice_logic = ""
+    if voice_type == "man":
+        voice_logic = """
+        var v = voices.find(function(v) {
+            return v.lang.startsWith('en') && v.name.match(/male|man|david|mark|daniel|google uk english male/i);
+        }) || voices.find(function(v) { return v.lang.startsWith('en') && !v.name.match(/female|woman/i); });
+        msg.pitch = 0.85; msg.rate = 0.95;
+        """
+    elif voice_type == "woman":
+        voice_logic = """
+        var v = voices.find(function(v) {
+            return v.lang.startsWith('en') && v.name.match(/female|woman|samantha|zira|google us english|karen|victoria/i);
+        }) || voices.find(function(v) { return v.lang.startsWith('en'); });
+        msg.pitch = 1.2; msg.rate = 1.0;
+        """
+    else:  # realistic
+        voice_logic = """
+        var v = voices.find(function(v) {
+            return v.name.match(/google|neural|natural|premium|enhanced/i) && v.lang.startsWith('en');
+        }) || voices.find(function(v) { return v.lang === 'en-US'; });
+        msg.pitch = 1.0; msg.rate = 0.97;
+        """
+
     return f"""
     <script>
     (function() {{
         try {{
             window.speechSynthesis.cancel();
             var msg = new SpeechSynthesisUtterance('{safe}');
-            msg.lang = 'en-US'; msg.rate = 1.0; msg.pitch = 1.05; msg.volume = 1.0;
+            msg.lang = 'en-US';
+            msg.volume = 1.0;
             var voices = window.speechSynthesis.getVoices();
-            var preferred = voices.find(v => v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Daniel'));
-            if (preferred) msg.voice = preferred;
+            {voice_logic}
+            if (v) msg.voice = v;
+
+            // trigger wave in parent iframe
+            try {{
+                window.parent.postMessage({{type:'mesta_speak', text:'{safe}'}}, '*');
+            }} catch(e) {{}}
+
+            // also try direct DOM in same page
+            setTimeout(function() {{
+                var frames = window.parent.document.querySelectorAll('iframe');
+                for (var i=0; i<frames.length; i++) {{
+                    try {{
+                        var waveEl = frames[i].contentDocument.getElementById('waveEl');
+                        if (waveEl) {{
+                            waveEl.classList.add('speaking');
+                            var st = frames[i].contentDocument.getElementById('waveStatus');
+                            if(st) {{ st.textContent='Speaking...'; st.classList.add('active'); }}
+                            var dur = Math.max(2000, '{safe}'.length * 55);
+                            setTimeout(function(){{
+                                waveEl.classList.remove('speaking');
+                                if(st) {{ st.textContent='Ready'; st.classList.remove('active'); }}
+                            }}, dur);
+                        }}
+                    }} catch(e) {{}}
+                }}
+            }}, 100);
+
             window.speechSynthesis.speak(msg);
         }} catch(e) {{ console.log('TTS:', e); }}
     }})();
@@ -340,7 +504,7 @@ def ask_mistral(question):
     data = {
         "model": "mistral-small-latest",
         "messages": [
-            {"role": "system", "content": "You are Mesta AI, a sleek and intelligent personal assistant created by Nirbhay. Answer clearly and concisely in 2-3 sentences."},
+            {"role": "system", "content": "You are Mesta AI, a sleek intelligent assistant created by Nirbhay. Answer clearly and concisely in 2-3 sentences."},
             {"role": "user", "content": question}
         ],
         "max_tokens": 200
@@ -356,12 +520,12 @@ if st.session_state.pending_audio:
     st.components.v1.html(st.session_state.pending_audio, height=0)
     st.session_state.pending_audio = None
 
-# ── MODE TOGGLE ──
+# ── RESPONSE MODE ──
 st.markdown('<div class="section-label">⚙ Response Mode</div>', unsafe_allow_html=True)
 col_t, col_v, col_sp = st.columns([1, 1, 4])
 with col_t:
     if st.button(
-        "📝  Text" if st.session_state.output_mode != "text" else "✅  Text",
+        "✅  Text" if st.session_state.output_mode == "text" else "📝  Text",
         use_container_width=True,
         type="primary" if st.session_state.output_mode == "text" else "secondary"
     ):
@@ -369,19 +533,48 @@ with col_t:
         st.rerun()
 with col_v:
     if st.button(
-        "🔊  Voice" if st.session_state.output_mode != "voice" else "✅  Voice",
+        "✅  Voice" if st.session_state.output_mode == "voice" else "🔊  Voice",
         use_container_width=True,
         type="primary" if st.session_state.output_mode == "voice" else "secondary"
     ):
         st.session_state.output_mode = "voice"
         st.rerun()
 
-if st.session_state.output_mode == "text":
-    st.markdown('<div class="mode-indicator">📝 &nbsp;Text replies only</div>', unsafe_allow_html=True)
+# ── VOICE TYPE SELECTOR ──
+if st.session_state.output_mode == "voice":
+    st.markdown('<div class="section-label">🎙 Voice Type</div>', unsafe_allow_html=True)
+    vc1, vc2, vc3, vc_sp = st.columns([1, 1, 1, 3])
+    with vc1:
+        if st.button(
+            "✅ 👨 Man" if st.session_state.voice_type == "man" else "👨 Man",
+            use_container_width=True,
+            type="primary" if st.session_state.voice_type == "man" else "secondary"
+        ):
+            st.session_state.voice_type = "man"
+            st.rerun()
+    with vc2:
+        if st.button(
+            "✅ 👩 Woman" if st.session_state.voice_type == "woman" else "👩 Woman",
+            use_container_width=True,
+            type="primary" if st.session_state.voice_type == "woman" else "secondary"
+        ):
+            st.session_state.voice_type = "woman"
+            st.rerun()
+    with vc3:
+        if st.button(
+            "✅ 🎭 Realistic" if st.session_state.voice_type == "realistic" else "🎭 Realistic",
+            use_container_width=True,
+            type="primary" if st.session_state.voice_type == "realistic" else "secondary"
+        ):
+            st.session_state.voice_type = "realistic"
+            st.rerun()
+    voice_labels = {"man": "👨 Deep male voice", "woman": "👩 Female voice", "realistic": "🎭 Most natural voice available"}
+    st.markdown(f'<div class="mode-indicator">{voice_labels[st.session_state.voice_type]}</div>', unsafe_allow_html=True)
 else:
-    st.markdown('<div class="mode-indicator">🔊 &nbsp;Voice + Text replies active</div>', unsafe_allow_html=True)
+    st.markdown('<div class="mode-indicator">📝 &nbsp;Text replies only</div>', unsafe_allow_html=True)
 
-# ── QUICK QUESTIONS (HTML cards for design, st.buttons hidden for logic) ──
+# ── QUICK QUESTIONS ──
+st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 st.markdown('<div class="section-label">⚡ Quick Questions</div>', unsafe_allow_html=True)
 
 quick_qs = [
@@ -396,20 +589,22 @@ quick_qs = [
 cols = st.columns(3)
 for i, (icon, title, sub) in enumerate(quick_qs):
     with cols[i % 3]:
-        if st.button(f"{icon} {title}\n{sub}", use_container_width=True, key=f"qq_{i}"):
+        if st.button(f"{icon} {title}", use_container_width=True, key=f"qq_{i}"):
             with st.spinner("✦ Thinking..."):
                 answer = ask_mistral(title)
                 st.session_state.chat_history.append({
                     "q": title, "a": answer,
                     "t": datetime.now().strftime("%I:%M %p"),
-                    "mode": st.session_state.output_mode
+                    "mode": st.session_state.output_mode,
+                    "voice": st.session_state.voice_type
                 })
                 if st.session_state.output_mode == "voice":
-                    st.session_state.pending_audio = speak_text(answer)
+                    st.session_state.pending_audio = speak_text(answer, st.session_state.voice_type)
                 st.rerun()
 
 # ── INPUT ──
 st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
+st.markdown('<div class="section-label">💬 Ask Mesta</div>', unsafe_allow_html=True)
 
 user_question = st.text_input(
     "", placeholder="Ask Mesta anything...",
@@ -422,17 +617,17 @@ with col1:
 with col2:
     clear_clicked = st.button("🗑 Clear Chat", use_container_width=True)
 
-# ── PROCESS ──
 if ask_clicked and user_question:
     with st.spinner("✦ Thinking..."):
         answer = ask_mistral(user_question)
         st.session_state.chat_history.append({
             "q": user_question, "a": answer,
             "t": datetime.now().strftime("%I:%M %p"),
-            "mode": st.session_state.output_mode
+            "mode": st.session_state.output_mode,
+            "voice": st.session_state.voice_type
         })
         if st.session_state.output_mode == "voice":
-            st.session_state.pending_audio = speak_text(answer)
+            st.session_state.pending_audio = speak_text(answer, st.session_state.voice_type)
         st.rerun()
 
 if clear_clicked:
@@ -445,14 +640,17 @@ if st.session_state.chat_history:
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     st.markdown('<div class="section-label">💬 Conversation</div>', unsafe_allow_html=True)
     for chat in reversed(st.session_state.chat_history[-15:]):
-        voice_tag = " 🔊" if chat.get("mode") == "voice" else ""
+        voice_icon = ""
+        if chat.get("mode") == "voice":
+            icons = {"man": "👨🔊", "woman": "👩🔊", "realistic": "🎭🔊"}
+            voice_icon = " " + icons.get(chat.get("voice", "man"), "🔊")
         st.markdown(
             f'<div class="user-bubble"><strong>You</strong><br>{chat["q"]}</div>',
             unsafe_allow_html=True
         )
         st.markdown(
             f'''<div class="ai-bubble">
-                <div class="ai-name">✦ Mesta{voice_tag}</div>
+                <div class="ai-name">✦ Mesta{voice_icon}</div>
                 {chat["a"]}
                 <div class="msg-time">{chat["t"]}</div>
             </div>''',
