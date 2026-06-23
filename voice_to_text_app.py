@@ -88,7 +88,11 @@ st.markdown("""
     -webkit-background-clip:text; -webkit-text-fill-color:transparent;
     animation:shimmer 5s linear infinite;
 }
-.tr-tagline { color:#1e293b; font-size:0.8rem; letter-spacing:0.04em; }
+.tr-tagline { 
+    color: #94a3b8; 
+    font-size:0.8rem; 
+    letter-spacing:0.04em; 
+}
 .tr-pills {
     display:flex; justify-content:center; gap:8px; flex-wrap:wrap;
     margin-top:1.2rem;
@@ -98,7 +102,7 @@ st.markdown("""
     background:rgba(255,255,255,0.03);
     border:1px solid rgba(255,255,255,0.07);
     border-radius:100px; padding:4px 12px;
-    font-size:0.68rem; font-weight:500; color:#334155;
+    font-size:0.68rem; font-weight:500; color:#94a3b8;
 }
 
 /* ─── TAB SWITCHER ──────────────────────────────── */
@@ -131,7 +135,8 @@ st.markdown("""
 }
 .input-panel:hover { border-color:rgba(139,92,246,0.18); }
 .panel-title {
-    font-size:0.68rem; font-weight:700; color:#2d3748;
+    font-size:0.68rem; font-weight:700; 
+    color: #cbd5e1;
     text-transform:uppercase; letter-spacing:2px;
     margin-bottom:1.1rem;
     display:flex; align-items:center; gap:8px;
@@ -140,22 +145,24 @@ st.markdown("""
 
 /* ─── RECORD ZONE ───────────────────────────────── */
 .rec-hint {
-    color:#1e293b; font-size:0.75rem; text-align:center;
+    color: #94a3b8; 
+    font-size:0.75rem; text-align:center;
     padding:0.4rem 0 0.8rem; letter-spacing:0.02em;
 }
 
 /* ─── FILE UPLOADER ─────────────────────────────── */
 [data-testid="stFileUploader"] {
     background:rgba(255,255,255,0.015) !important;
-    border:1.5px dashed rgba(139,92,246,0.18) !important;
+    border: 1px solid rgba(255,255,255,0.06) !important;
     border-radius:12px !important;
     transition:border-color 0.2s !important;
 }
 [data-testid="stFileUploader"]:hover {
-    border-color:rgba(139,92,246,0.42) !important;
+    border-color:rgba(139,92,246,0.3) !important;
     background:rgba(139,92,246,0.03) !important;
 }
-[data-testid="stFileUploader"] span { color:#334155 !important; }
+[data-testid="stFileUploader"] span { color:#94a3b8 !important; }
+[data-testid="stFileUploader"] .stFileUploaderLabel { color:#94a3b8 !important; }
 
 /* ─── VIDEO/AUDIO ───────────────────────────────── */
 [data-testid="stVideo"],[data-testid="stAudio"] {
@@ -170,20 +177,20 @@ st.markdown("""
     border-radius:14px;
     padding:20px 22px;
     min-height:150px; max-height:480px;
-    color:#94a3b8; font-size:0.88rem; line-height:1.85;
+    color:#d1d5db; font-size:0.88rem; line-height:1.85;
     white-space:pre-wrap; overflow-y:auto;
     animation:fadeUp 0.5s ease both;
     margin-bottom:0;
 }
 .tr-box-gold { border-color:rgba(251,191,36,0.18) !important; }
 
-/* ─── ACTION ROW (3 buttons under transcription) ── */
+/* ─── ACTION ROW ──────────────────────────────────── */
 .action-row {
     display:grid; grid-template-columns:1fr 1fr 1fr;
     gap:10px; margin-top:12px;
 }
-/* Force equal height on Streamlit button wrappers */
-.action-row .stButton, .action-row [data-testid="stDownloadButton"] {
+.action-row .stButton,
+.action-row [data-testid="stDownloadButton"] {
     height:40px !important;
 }
 .action-row .stButton > button,
@@ -196,7 +203,8 @@ st.markdown("""
 /* ─── SECTION LABEL ─────────────────────────────── */
 .tr-section {
     display:flex; align-items:center; gap:9px;
-    color:#1e293b; font-size:0.64rem; font-weight:700;
+    color: #94a3b8; 
+    font-size:0.64rem; font-weight:700;
     text-transform:uppercase; letter-spacing:2.5px;
     margin:2rem 0 1rem;
 }
@@ -226,14 +234,18 @@ st.markdown("""
 }
 .hist-badge {
     font-size:0.62rem; font-weight:800;
-    color:#7c3aed; text-transform:uppercase; letter-spacing:1.5px;
+    color:#a78bfa; text-transform:uppercase; letter-spacing:1.5px;
     background:rgba(124,58,237,0.12);
     border:1px solid rgba(124,58,237,0.2);
     border-radius:6px; padding:2px 8px;
 }
-.hist-time { color:#334155; font-size:0.65rem; font-weight:500; }
+.hist-time { 
+    color: #94a3b8; 
+    font-size:0.65rem; font-weight:500; 
+}
 .hist-preview {
-    color:#64748b; font-size:0.8rem; line-height:1.55;
+    color:#cbd5e1; 
+    font-size:0.8rem; line-height:1.55;
     overflow:hidden;
     display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
 }
@@ -282,12 +294,12 @@ st.markdown("""
 }
 .stButton > button[kind="secondary"] {
     background:rgba(255,255,255,0.04) !important;
-    color:#475569 !important; box-shadow:none !important;
+    color:#94a3b8 !important; box-shadow:none !important;
     border:1px solid rgba(255,255,255,0.08) !important;
 }
 .stButton > button[kind="secondary"]:hover {
     background:rgba(255,255,255,0.08) !important;
-    color:#94a3b8 !important; transform:none !important;
+    color:#cbd5e1 !important; transform:none !important;
 }
 [data-testid="stDownloadButton"] button {
     background:linear-gradient(135deg,#7c3aed,#6366f1) !important;
@@ -303,7 +315,10 @@ st.markdown("""
 }
 
 /* ─── CHECKBOX ───────────────────────────────────── */
-[data-testid="stCheckbox"] label { color:#475569 !important; font-size:0.8rem !important; }
+[data-testid="stCheckbox"] label { 
+    color: #cbd5e1 !important; 
+    font-size:0.8rem !important; 
+}
 
 /* ─── SELECT ─────────────────────────────────────── */
 [data-testid="stSelectbox"] > div > div {
@@ -311,9 +326,13 @@ st.markdown("""
     border:1px solid rgba(255,255,255,0.09) !important;
     border-radius:10px !important; color:#cbd5e1 !important;
 }
+[data-testid="stSelectbox"] select { color:#cbd5e1 !important; }
 
 /* ─── CAPTION ────────────────────────────────────── */
-.stCaption p,[data-testid="stCaptionContainer"] p { color:#2d3748 !important; font-size:0.7rem !important; }
+.stCaption p,[data-testid="stCaptionContainer"] p { 
+    color: #94a3b8 !important; 
+    font-size:0.7rem !important; 
+}
 
 /* ─── STATUS ─────────────────────────────────────── */
 .tr-ok {
@@ -341,7 +360,7 @@ st.markdown("""
 
 /* ─── FOOTER ─────────────────────────────────────── */
 .tr-footer {
-    text-align:center; color:#1e293b;
+    text-align:center; color:#94a3b8;
     font-size:0.6rem; font-weight:500; letter-spacing:1px;
     padding:1.5rem 0 0.5rem;
 }
@@ -420,6 +439,7 @@ st.markdown("""
   <div class="tr-pills">
     <span class="tr-pill">🎙 Record Live</span>
     <span class="tr-pill">📁 Upload File</span>
+    <span class="tr-pill">🌐 URL Import</span>
     <span class="tr-pill">👥 Speaker Labels</span>
     <span class="tr-pill">🌐 Translate</span>
     <span class="tr-pill">📜 History</span>
@@ -428,16 +448,21 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ─── TAB SWITCHER ────────────────────────────────────────────
-col_t1, col_t2 = st.columns(2)
+col_t1, col_t2, col_t3 = st.columns(3)
 with col_t1:
-    if st.button("🎙  Record Voice", use_container_width=True,
+    if st.button("🎙  Record", use_container_width=True,
                  type="primary" if st.session_state.input_mode=="record" else "secondary"):
         st.session_state.input_mode = "record"
         st.rerun()
 with col_t2:
-    if st.button("📁  Upload File", use_container_width=True,
+    if st.button("📁  Upload", use_container_width=True,
                  type="primary" if st.session_state.input_mode=="upload" else "secondary"):
         st.session_state.input_mode = "upload"
+        st.rerun()
+with col_t3:
+    if st.button("🌐  URL", use_container_width=True,
+                 type="primary" if st.session_state.input_mode=="url" else "secondary"):
+        st.session_state.input_mode = "url"
         st.rerun()
 
 # ─── RECORD PANEL ────────────────────────────────────────────
@@ -479,7 +504,7 @@ if st.session_state.input_mode == "record":
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ─── UPLOAD PANEL ────────────────────────────────────────────
-else:
+elif st.session_state.input_mode == "upload":
     st.markdown("""
     <div class="input-panel">
       <div class="panel-title">
@@ -493,7 +518,7 @@ else:
       </div>
     """, unsafe_allow_html=True)
 
-    st.caption("MP3 · WAV · M4A · FLAC · WebM · MP4 · MOV · AVI · MKV")
+    st.caption("MP3 · WAV · M4A · FLAC · WebM · MP4 · MOV · AVI · MKV (up to 200MB)")
 
     uploaded_file = st.file_uploader("u", type=["mp3","wav","m4a","flac","webm","mp4","mov","avi","mkv"], label_visibility="collapsed")
 
@@ -530,6 +555,47 @@ else:
 
     st.markdown('</div>', unsafe_allow_html=True)
 
+# ─── URL PANEL ────────────────────────────────────────────────
+else:
+    st.markdown("""
+    <div class="input-panel">
+      <div class="panel-title">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        Import from URL (no size limit)
+      </div>
+    """, unsafe_allow_html=True)
+
+    st.caption("Paste a direct link to an audio/video file (supports any size up to 5GB)")
+
+    url_input = st.text_input("File URL", placeholder="https://example.com/audio.mp3", label_visibility="collapsed")
+    conversation_mode = st.checkbox("Speaker labels (Conversation Mode)", value=True)
+
+    if st.button("Transcribe from URL", type="primary", use_container_width=True) and url_input:
+        with st.spinner("Processing remote file…"):
+            try:
+                config = aai.TranscriptionConfig(speaker_labels=True, speakers_expected=2)
+                transcriber = aai.Transcriber(config=config)
+                transcript = transcriber.transcribe(url_input)
+                if transcript.text:
+                    formatted = format_transcript(transcript, conversation_mode)
+                    st.session_state.transcribed_text = formatted
+                    st.session_state.original_text = transcript.text
+                    st.session_state.translated_text = ""
+                    mode = "Conversation" if conversation_mode else "Standard"
+                    add_to_history(formatted, formatted, mode)
+                    st.markdown('<div class="tr-ok">✓ &nbsp;Transcription complete!</div>', unsafe_allow_html=True)
+                else:
+                    st.markdown('<div class="tr-err">⚠ No speech detected.</div>', unsafe_allow_html=True)
+            except Exception as e:
+                st.markdown(f'<div class="tr-err">⚠ {e}</div>', unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
 # ─── TRANSCRIPTION OUTPUT ────────────────────────────────────
 if st.session_state.transcribed_text:
     st.markdown("""
@@ -546,7 +612,6 @@ if st.session_state.transcribed_text:
 
     st.markdown(f'<div class="tr-box">{st.session_state.transcribed_text}</div>', unsafe_allow_html=True)
 
-    # 3 equal-height action buttons — separated from box by margin-top in CSS
     st.markdown('<div class="action-row">', unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
     with c1:
@@ -577,7 +642,7 @@ if st.session_state.show_translate and st.session_state.transcribed_text:
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <circle cx="12" cy="12" r="10"/>
         <line x1="2" y1="12" x2="22" y2="12"/>
-        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/>
       </svg>
       Translate
     </div>
