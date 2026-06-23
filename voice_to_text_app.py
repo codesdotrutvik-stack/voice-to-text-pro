@@ -6,6 +6,8 @@ import requests
 import json
 import hashlib
 import re
+import gdown
+import tempfile
 
 st.set_page_config(page_title="Transcriptr", page_icon="🎙️", layout="wide")
 
@@ -30,20 +32,6 @@ def save_history(history):
             json.dump(history, f, indent=2)
     except:
         pass
-
-def get_google_drive_direct_link(url):
-    """Convert Google Drive share link to direct download URL"""
-    # Pattern for drive.google.com/file/d/.../view
-    match = re.search(r'/file/d/([^/]+)/', url)
-    if match:
-        file_id = match.group(1)
-        return f"https://drive.google.com/uc?export=download&id={file_id}"
-    # Pattern for drive.google.com/open?id=...
-    match = re.search(r'[?&]id=([^&]+)', url)
-    if match:
-        file_id = match.group(1)
-        return f"https://drive.google.com/uc?export=download&id={file_id}"
-    return url
 
 st.markdown("""
 <style>
@@ -73,7 +61,6 @@ st.markdown("""
     50%      { opacity:0.4; }
 }
 
-/* ─── HEADER ────────────────────────────────────── */
 .tr-header { text-align:center; padding:2.8rem 0 2.2rem; animation:fadeUp 0.7s ease both; }
 .tr-badge {
     display:inline-flex; align-items:center; gap:7px;
@@ -120,7 +107,6 @@ st.markdown("""
     font-size:0.68rem; font-weight:500; color:#94a3b8;
 }
 
-/* ─── TAB SWITCHER ──────────────────────────────── */
 .tab-bar {
     display:flex; gap:4px;
     background:rgba(255,255,255,0.025);
@@ -140,7 +126,6 @@ st.markdown("""
     box-shadow:0 2px 12px rgba(124,58,237,0.3);
 }
 
-/* ─── INPUT PANEL ───────────────────────────────── */
 .input-panel {
     background:rgba(255,255,255,0.022);
     border:1px solid rgba(255,255,255,0.07);
@@ -158,14 +143,12 @@ st.markdown("""
 }
 .panel-title svg { flex-shrink:0; }
 
-/* ─── RECORD ZONE ───────────────────────────────── */
 .rec-hint {
     color: #94a3b8; 
     font-size:0.75rem; text-align:center;
     padding:0.4rem 0 0.8rem; letter-spacing:0.02em;
 }
 
-/* ─── FILE UPLOADER ─────────────────────────────── */
 [data-testid="stFileUploader"] {
     background:rgba(255,255,255,0.015) !important;
     border: 1px solid rgba(255,255,255,0.06) !important;
@@ -179,13 +162,11 @@ st.markdown("""
 [data-testid="stFileUploader"] span { color:#94a3b8 !important; }
 [data-testid="stFileUploader"] .stFileUploaderLabel { color:#94a3b8 !important; }
 
-/* ─── VIDEO/AUDIO ───────────────────────────────── */
 [data-testid="stVideo"],[data-testid="stAudio"] {
     width:100% !important; border-radius:12px !important;
     overflow:hidden !important; margin-bottom:0.5rem !important;
 }
 
-/* ─── TRANSCRIPTION BOX ─────────────────────────── */
 .tr-box {
     background:rgba(255,255,255,0.022);
     border:1px solid rgba(255,255,255,0.07);
@@ -199,7 +180,6 @@ st.markdown("""
 }
 .tr-box-gold { border-color:rgba(251,191,36,0.18) !important; }
 
-/* ─── ACTION ROW ──────────────────────────────────── */
 .action-row {
     display:grid; grid-template-columns:1fr 1fr 1fr;
     gap:10px; margin-top:12px;
@@ -215,7 +195,6 @@ st.markdown("""
     font-weight:600 !important;
 }
 
-/* ─── SECTION LABEL ─────────────────────────────── */
 .tr-section {
     display:flex; align-items:center; gap:9px;
     color: #94a3b8; 
@@ -228,7 +207,6 @@ st.markdown("""
     background:rgba(255,255,255,0.05);
 }
 
-/* ─── HISTORY ───────────────────────────────────── */
 .hist-card {
     display:flex; align-items:stretch;
     background:rgba(255,255,255,0.028);
@@ -264,7 +242,6 @@ st.markdown("""
     overflow:hidden;
     display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
 }
-/* Download side panel */
 .hist-dl-side {
     width:52px; min-width:52px;
     background:rgba(139,92,246,0.06);
@@ -275,7 +252,6 @@ st.markdown("""
 }
 .hist-dl-side:hover { background:rgba(139,92,246,0.14); }
 
-/* Override download button inside hist side */
 .hist-dl-col [data-testid="stDownloadButton"] button {
     background:rgba(139,92,246,0.07) !important;
     border:none !important;
@@ -292,7 +268,6 @@ st.markdown("""
     background:rgba(139,92,246,0.18) !important;
 }
 
-/* ─── BUTTONS ────────────────────────────────────── */
 .stButton > button {
     background:linear-gradient(135deg,#7c3aed,#6366f1) !important;
     color:#fff !important; border:none !important;
@@ -329,13 +304,11 @@ st.markdown("""
     box-shadow:0 4px 22px rgba(124,58,237,0.36) !important;
 }
 
-/* ─── CHECKBOX ───────────────────────────────────── */
 [data-testid="stCheckbox"] label { 
     color: #cbd5e1 !important; 
     font-size:0.8rem !important; 
 }
 
-/* ─── SELECT ─────────────────────────────────────── */
 [data-testid="stSelectbox"] > div > div {
     background:rgba(255,255,255,0.04) !important;
     border:1px solid rgba(255,255,255,0.09) !important;
@@ -343,13 +316,11 @@ st.markdown("""
 }
 [data-testid="stSelectbox"] select { color:#cbd5e1 !important; }
 
-/* ─── CAPTION ────────────────────────────────────── */
 .stCaption p,[data-testid="stCaptionContainer"] p { 
     color: #94a3b8 !important; 
     font-size:0.7rem !important; 
 }
 
-/* ─── STATUS ─────────────────────────────────────── */
 .tr-ok {
     display:flex; align-items:center; gap:10px;
     background:rgba(16,185,129,0.07); border:1px solid rgba(16,185,129,0.18);
@@ -368,12 +339,10 @@ st.markdown("""
     font-size:0.8rem; margin:0.7rem 0;
 }
 
-/* ─── SCROLLBAR ──────────────────────────────────── */
 ::-webkit-scrollbar { width:4px; }
 ::-webkit-scrollbar-track { background:transparent; }
 ::-webkit-scrollbar-thumb { background:#4c1d95; border-radius:10px; }
 
-/* ─── FOOTER ─────────────────────────────────────── */
 .tr-footer {
     text-align:center; color:#94a3b8;
     font-size:0.6rem; font-weight:500; letter-spacing:1px;
@@ -381,7 +350,6 @@ st.markdown("""
 }
 .tr-footer em { color:#6d28d9; font-style:normal; }
 
-/* ─── MISC ───────────────────────────────────────── */
 .tr-hr {
     height:1px;
     background:linear-gradient(90deg,transparent,rgba(139,92,246,0.12),transparent);
@@ -581,29 +549,34 @@ else:
           <line x1="2" y1="12" x2="22" y2="12"/>
           <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/>
         </svg>
-        Import from URL (no size limit)
+        Import from URL
       </div>
     """, unsafe_allow_html=True)
 
-    st.caption("Paste a direct link to an audio/video file (supports any size up to 5GB)")
+    st.caption("Paste any direct audio/video URL or Google Drive share link (file must be publicly accessible)")
 
-    url_input = st.text_input("File URL", placeholder="https://drive.google.com/... or https://example.com/file.mp3", label_visibility="collapsed")
-
-    if url_input:
-        # Convert Google Drive share link to direct download link
-        direct_url = get_google_drive_direct_link(url_input)
-        if direct_url != url_input:
-            st.info(f"🔗 Direct download URL: {direct_url}")
-
+    url_input = st.text_input("File URL", placeholder="https://drive.google.com/file/d/.../view or https://example.com/file.mp3", label_visibility="collapsed")
     conversation_mode = st.checkbox("Speaker labels (Conversation Mode)", value=True)
 
     if st.button("Transcribe from URL", type="primary", use_container_width=True) and url_input:
-        with st.spinner("Processing remote file…"):
+        with st.spinner("Processing…"):
             try:
-                direct = get_google_drive_direct_link(url_input)
+                # Determine if it's a Google Drive link
+                if "drive.google.com" in url_input:
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_file:
+                        temp_path = tmp_file.name
+                    # Download from Google Drive
+                    gdown.download(url_input, temp_path, quiet=False)
+                    file_path = temp_path
+                else:
+                    # Direct URL – let AssemblyAI handle it
+                    file_path = url_input
+
+                # Transcribe
                 config = aai.TranscriptionConfig(speaker_labels=True, speakers_expected=2)
                 transcriber = aai.Transcriber(config=config)
-                transcript = transcriber.transcribe(direct)
+                transcript = transcriber.transcribe(file_path)
+
                 if transcript.text:
                     formatted = format_transcript(transcript, conversation_mode)
                     st.session_state.transcribed_text = formatted
@@ -614,8 +587,16 @@ else:
                     st.markdown('<div class="tr-ok">✓ &nbsp;Transcription complete!</div>', unsafe_allow_html=True)
                 else:
                     st.markdown('<div class="tr-err">⚠ No speech detected. Make sure the file is publicly accessible.</div>', unsafe_allow_html=True)
+
             except Exception as e:
-                st.markdown(f'<div class="tr-err">⚠ {e}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="tr-err">⚠ {str(e)}</div>', unsafe_allow_html=True)
+            finally:
+                # Clean up temp file if created
+                if 'temp_path' in locals() and os.path.exists(temp_path):
+                    try:
+                        os.remove(temp_path)
+                    except:
+                        pass
 
     st.markdown('</div>', unsafe_allow_html=True)
 
