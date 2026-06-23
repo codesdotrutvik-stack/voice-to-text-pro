@@ -6,7 +6,7 @@ import requests
 import json
 import hashlib
 
-st.set_page_config(page_title="Voice to Text Pro", page_icon="📝", layout="wide")
+st.set_page_config(page_title="Voice to Text Pro", page_icon="✨", layout="wide")
 
 # ============================================================
 # API KEYS
@@ -17,7 +17,28 @@ MISTRAL_KEY = "tXPmUYPeEqwD48MrvREFmn3GmvB7KqRk"
 aai.settings.api_key = ASSEMBLYAI_KEY
 
 # ============================================================
-# PREMIUM LIGHT MODE CSS
+# HISTORY FILE
+# ============================================================
+HISTORY_FILE = "history.json"
+
+def load_history():
+    try:
+        if os.path.exists(HISTORY_FILE):
+            with open(HISTORY_FILE, "r") as f:
+                return json.load(f)
+        return []
+    except:
+        return []
+
+def save_history(history):
+    try:
+        with open(HISTORY_FILE, "w") as f:
+            json.dump(history, f, indent=2)
+    except:
+        pass
+
+# ============================================================
+# PREMIUM CSS
 # ============================================================
 st.markdown("""
 <style>
@@ -34,13 +55,17 @@ st.markdown("""
 }
 
 .main-title {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: 2.8rem;
+    font-weight: 800;
     color: #1e293b;
     text-align: center;
     letter-spacing: -0.02em;
 }
-.main-title span { color: #7c3aed; }
+.main-title span { 
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 .main-sub {
     color: #64748b;
     text-align: center;
@@ -162,8 +187,9 @@ st.markdown("""
 # ============================================================
 # SESSION STATE
 # ============================================================
+# Load history from file
 if "history" not in st.session_state:
-    st.session_state.history = []
+    st.session_state.history = load_history()
 if "transcribed_text" not in st.session_state:
     st.session_state.transcribed_text = ""
 if "original_text" not in st.session_state:
@@ -223,10 +249,20 @@ def format_transcript(transcript, conversation_mode):
     else:
         return transcript.text
 
+def add_to_history(text, full_text, mode):
+    entry = {
+        "text": text[:500] + ("..." if len(text) > 500 else ""),
+        "full_text": full_text,
+        "time": datetime.now().strftime("%I:%M %p, %d %b"),
+        "mode": mode
+    }
+    st.session_state.history.insert(0, entry)
+    save_history(st.session_state.history)
+
 # ============================================================
 # HEADER
 # ============================================================
-st.markdown('<div class="main-title">📝 Voice to Text <span>Pro</span></div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">✨ Voice to Text <span>Pro</span></div>', unsafe_allow_html=True)
 st.markdown('<div class="main-sub">Upload audio/video • Record voice • AI transcribes • Translate</div>', unsafe_allow_html=True)
 
 # ============================================================
@@ -241,7 +277,7 @@ if st.session_state.copy_msg:
 # ============================================================
 with st.container():
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown("### 🎙️ Record Voice")
+    st.markdown("🎙️ Record Voice")
     
     audio_value = st.audio_input("Click to record", key="audio_recorder")
     
@@ -268,13 +304,7 @@ with st.container():
                     formatted = format_transcript(transcript, True)
                     st.session_state.transcribed_text = formatted
                     st.session_state.original_text = transcript.text
-                    
-                    st.session_state.history.append({
-                        "text": formatted[:500] + ("..." if len(formatted) > 500 else ""),
-                        "full_text": formatted,
-                        "time": datetime.now().strftime("%I:%M %p, %d %b"),
-                        "mode": "Conversation"
-                    })
+                    add_to_history(formatted, formatted, "Conversation")
                     st.success("✅ Transcription complete!")
                 else:
                     st.error("❌ No text detected. Please try again.")
@@ -295,7 +325,7 @@ with st.container():
 # ============================================================
 with st.container():
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown("### 📤 Upload File")
+    st.markdown("📤 Upload File")
     st.caption("Supported: MP3, WAV, M4A, FLAC, WebM, MP4, MOV, AVI, MKV")
 
     uploaded_file = st.file_uploader(
@@ -316,7 +346,7 @@ with st.container():
         file_size = len(uploaded_file.getvalue()) / (1024 * 1024)
         st.caption(f"📁 {uploaded_file.name} | {file_size:.2f} MB")
         
-        conversation_mode = st.checkbox("💬 Conversation Mode (Speaker Labels)", value=True)
+        conversation_mode = st.checkbox("💬 Conversation Mode", value=True)
 
         if st.button("🎯 Transcribe", type="primary", use_container_width=True):
             if file_hash != st.session_state.last_processed_file:
@@ -343,12 +373,8 @@ with st.container():
                             st.session_state.original_text = transcript.text
                             
                             st.session_state.translated_text = ""
-                            st.session_state.history.append({
-                                "text": formatted[:500] + ("..." if len(formatted) > 500 else ""),
-                                "full_text": formatted,
-                                "time": datetime.now().strftime("%I:%M %p, %d %b"),
-                                "mode": "Conversation" if conversation_mode else "Standard"
-                            })
+                            mode = "Conversation" if conversation_mode else "Standard"
+                            add_to_history(formatted, formatted, mode)
                             st.success("✅ Transcription complete!")
                         else:
                             st.error("❌ No text detected. Please try again.")
@@ -367,7 +393,7 @@ with st.container():
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ============================================================
-# DISPLAY TRANSCRIPTION (NO COPY BUTTON)
+# DISPLAY TRANSCRIPTION
 # ============================================================
 if st.session_state.transcribed_text:
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
@@ -392,7 +418,7 @@ if st.session_state.transcribed_text:
             st.session_state.translated_text = ""
             st.rerun()
     with col3:
-        if st.button("🔁 Translate", key="translate_btn", use_container_width=True):
+        if st.button("🌐 Translate", key="translate_btn", use_container_width=True):
             st.session_state.show_translate = not st.session_state.get("show_translate", False)
             st.rerun()
 
@@ -434,7 +460,7 @@ if st.session_state.get("show_translate", False) and st.session_state.transcribe
                     )
 
 # ============================================================
-# HISTORY (NO COPY BUTTONS)
+# HISTORY (PERSISTENT - SAVED TO FILE)
 # ============================================================
 if st.session_state.history:
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
@@ -452,7 +478,6 @@ if st.session_state.history:
             </div>
             """, unsafe_allow_html=True)
             
-            # Only download button in history
             st.download_button(
                 label="📥 Download",
                 data=item.get('full_text', item['text']),
@@ -465,10 +490,11 @@ if st.session_state.history:
     
     if st.button("🗑️ Clear All History", use_container_width=True):
         st.session_state.history = []
+        save_history(st.session_state.history)
         st.rerun()
 
 # ============================================================
 # FOOTER
 # ============================================================
 st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-st.markdown('<div style="text-align: center; color: #94a3b8; font-size: 0.6rem;">📝 Voice to Text Pro · Powered by AssemblyAI + Mistral · Created by Nirbhay</div>', unsafe_allow_html=True)
+st.markdown('<div style="text-align: center; color: #94a3b8; font-size: 0.6rem;">✨ Voice to Text Pro · Powered by AssemblyAI + Mistral · Created by Nirbhay</div>', unsafe_allow_html=True)
