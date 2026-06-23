@@ -155,7 +155,7 @@ st.markdown("""
 .panel-title {
     font-size:0.68rem; font-weight:700; color:#a78bfa;
     text-transform:uppercase; letter-spacing:2px;
-    margin-bottom:1.1rem;
+    margin-bottom: 0;
     display:flex; align-items:center; gap:8px;
     justify-content: center;
 }
