@@ -38,343 +38,399 @@ def save_history(history):
         pass
 
 # ============================================================
-# PREMIUM CSS — Next-Level Dark Design
+# PREMIUM CSS — Next-Level Design
 # ============================================================
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Syne:wght@700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap');
 
 *, *::before, *::after {
     margin: 0; padding: 0; box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+/* ── App Background ── */
 .stApp {
-    background: #080810;
+    background: #09090b;
     min-height: 100vh;
 }
 
 .block-container {
-    padding: 2.5rem 2rem 4rem 2rem !important;
+    padding: 2.5rem 2rem !important;
     max-width: 860px !important;
-    position: relative;
-    z-index: 1;
+    margin: 0 auto;
 }
 
+/* ── Animations ── */
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(16px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes shimmer {
     0%   { background-position: -200% center; }
-    100% { background-position: 200% center; }
+    100% { background-position:  200% center; }
+}
+@keyframes pulse-ring {
+    0%   { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
+    70%  { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+}
+@keyframes glow-line {
+    0%, 100% { opacity: 0.4; }
+    50%       { opacity: 1; }
 }
 
-/* ── HEADER ─────────────────────────────────────────── */
+/* ── Header ── */
 .vtp-header {
     text-align: center;
-    padding: 2.5rem 0 2rem;
-    animation: fadeUp 0.7s ease both;
+    padding: 3rem 0 2rem;
+    animation: fadeUp 0.6s ease;
 }
-.vtp-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(139,92,246,0.12);
-    border: 1px solid rgba(139,92,246,0.28);
-    border-radius: 100px;
-    padding: 5px 14px;
-    font-size: 0.68rem;
-    font-weight: 700;
-    color: #a78bfa;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 1.2rem;
-}
-.vtp-badge .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #8b5cf6;
-    box-shadow: 0 0 8px #8b5cf6;
+.vtp-logo-ring {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.2rem;
+    box-shadow: 0 0 32px rgba(124, 58, 237, 0.35);
+    font-size: 1.5rem;
 }
 .vtp-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 3.2rem;
+    font-size: 2.4rem;
     font-weight: 800;
-    color: #f1f5f9;
-    line-height: 1.1;
     letter-spacing: -0.04em;
-    margin-bottom: 0.8rem;
+    color: #fafafa;
+    line-height: 1;
+    margin-bottom: 0.5rem;
 }
 .vtp-title .accent {
-    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #38bdf8 100%);
+    background: linear-gradient(120deg, #a78bfa, #818cf8, #6366f1);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shimmer 5s linear infinite;
+    animation: shimmer 3s linear infinite;
 }
-.vtp-sub {
-    color: #475569;
-    font-size: 0.88rem;
+.vtp-subtitle {
+    color: #52525b;
+    font-size: 0.85rem;
+    font-weight: 400;
     letter-spacing: 0.02em;
 }
+.vtp-subtitle span {
+    color: #71717a;
+    margin: 0 6px;
+}
 
-/* ── CARDS ──────────────────────────────────────────── */
-.vtp-card {
-    background: rgba(255,255,255,0.025);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 20px;
-    padding: 1.6rem 1.8rem;
-    margin-bottom: 1.2rem;
-    transition: border-color 0.25s, box-shadow 0.25s;
-    animation: fadeUp 0.5s ease both;
+/* ── Card ── */
+.card {
+    background: #111113;
+    border: 1px solid #1f1f23;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    animation: fadeUp 0.5s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-.vtp-card:hover {
-    border-color: rgba(139,92,246,0.2);
-    box-shadow: 0 0 32px rgba(139,92,246,0.05);
+.card:hover {
+    border-color: #2d2d33;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
 }
-.vtp-card-label {
+.card-header {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #475569;
-    text-transform: uppercase;
-    letter-spacing: 2px;
     margin-bottom: 1rem;
 }
+.card-icon {
+    width: 32px; height: 32px;
+    background: rgba(124, 58, 237, 0.12);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+.card-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #a1a1aa;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+.card-caption {
+    font-size: 0.72rem;
+    color: #3f3f46;
+    margin-top: 2px;
+    letter-spacing: 0.01em;
+}
 
-/* ── FILE UPLOADER ──────────────────────────────────── */
+/* ── Upload Zone ── */
 [data-testid="stFileUploader"] {
-    background: rgba(255,255,255,0.015) !important;
-    border: 1.5px dashed rgba(139,92,246,0.2) !important;
-    border-radius: 14px !important;
-    transition: border-color 0.2s !important;
-}
-[data-testid="stFileUploader"]:hover {
-    border-color: rgba(139,92,246,0.45) !important;
-}
-
-/* ── VIDEO / AUDIO ──────────────────────────────────── */
-[data-testid="stVideo"], [data-testid="stAudio"] {
     width: 100% !important;
+}
+[data-testid="stFileUploader"] > div {
+    background: rgba(124, 58, 237, 0.03) !important;
+    border: 1.5px dashed #27272a !important;
     border-radius: 12px !important;
-    overflow: hidden !important;
+    padding: 1.8rem 1.5rem !important;
+    transition: all 0.2s ease !important;
+}
+[data-testid="stFileUploader"] > div:hover {
+    border-color: rgba(124, 58, 237, 0.4) !important;
+    background: rgba(124, 58, 237, 0.05) !important;
+}
+[data-testid="stFileUploader"] label { color: #52525b !important; font-size: 0.82rem !important; }
+
+/* ── Audio / Video ── */
+[data-testid="stAudio"], [data-testid="stVideo"] {
+    width: 100% !important;
+    border-radius: 10px;
+    overflow: hidden;
+}
+[data-testid="stAudio"] audio {
+    filter: invert(1) hue-rotate(180deg) !important;
 }
 
-/* ── TRANSCRIPTION BOX ──────────────────────────────── */
-.vtp-textbox {
-    background: rgba(255,255,255,0.025);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 14px;
-    padding: 20px 22px;
+/* ── Transcription Box ── */
+.text-box {
+    background: #0d0d10;
+    border: 1px solid #1f1f23;
+    border-radius: 12px;
+    padding: 20px;
     min-height: 140px;
-    color: #94a3b8;
-    font-size: 0.88rem;
-    line-height: 1.85;
+    color: #d4d4d8;
+    font-size: 0.9rem;
+    line-height: 1.9;
     white-space: pre-wrap;
-    max-height: 480px;
+    max-height: 520px;
     overflow-y: auto;
-    animation: fadeUp 0.5s ease both;
+    animation: fadeUp 0.4s ease;
+    font-family: 'Geist', sans-serif;
 }
-.vtp-textbox-translated {
-    border-color: rgba(251,191,36,0.15);
+.text-box::-webkit-scrollbar { width: 4px; }
+.text-box::-webkit-scrollbar-track { background: transparent; }
+.text-box::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
+
+/* ── History Item ── */
+.history-item {
+    background: #111113;
+    border: 1px solid #1f1f23;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin: 6px 0;
+    transition: all 0.18s ease;
+    animation: fadeUp 0.4s ease;
+    position: relative;
+}
+.history-item:hover {
+    border-color: rgba(124, 58, 237, 0.3);
+    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.06);
+}
+.history-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+.history-meta { flex: 1; min-width: 0; }
+.history-mode {
+    color: #a78bfa;
+    font-weight: 600;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+}
+.history-time {
+    color: #3f3f46;
+    font-size: 0.68rem;
+    margin-bottom: 6px;
+    font-family: 'Geist Mono', monospace;
+}
+.history-text {
+    color: #71717a;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-/* ── SECTION LABEL ──────────────────────────────────── */
-.vtp-section {
+/* ── Buttons — global Streamlit override ── */
+.stButton > button {
+    background: #18181b !important;
+    color: #a1a1aa !important;
+    border: 1px solid #27272a !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    font-size: 0.8rem !important;
+    padding: 7px 16px !important;
+    transition: all 0.18s ease !important;
+    box-shadow: none !important;
+    letter-spacing: 0.01em;
+}
+.stButton > button:hover {
+    background: #1f1f23 !important;
+    border-color: #3f3f46 !important;
+    color: #e4e4e7 !important;
+    transform: translateY(-1px);
+}
+
+/* Primary button */
+.stButton > button[kind="primary"],
+div[data-testid="column"] .stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3) !important;
+}
+.stButton > button[kind="primary"]:hover {
+    background: linear-gradient(135deg, #6d28d9, #5b21b6) !important;
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4) !important;
+    transform: translateY(-1px);
+}
+
+/* ── Section Labels ── */
+.section-label {
     display: flex;
     align-items: center;
-    gap: 10px;
-    color: #334155;
-    font-size: 0.66rem;
-    font-weight: 700;
+    gap: 8px;
+    color: #3f3f46;
+    font-size: 0.68rem;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    margin: 1.8rem 0 0.9rem;
+    letter-spacing: 0.1em;
+    margin: 1.6rem 0 0.8rem;
 }
-.vtp-section::after {
+.section-label::before, .section-label::after {
     content: '';
     flex: 1;
     height: 1px;
-    background: rgba(255,255,255,0.04);
+    background: #1f1f23;
 }
 
-/* ── HISTORY ITEMS ──────────────────────────────────── */
-.hist-wrap {
-    display: flex;
-    align-items: stretch;
-    gap: 0;
-    margin-bottom: 10px;
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 16px;
-    overflow: hidden;
-    transition: border-color 0.2s;
-    animation: fadeUp 0.4s ease both;
-}
-.hist-wrap:hover {
-    border-color: rgba(139,92,246,0.18);
-}
-.hist-body {
-    flex: 1;
-    background: rgba(255,255,255,0.02);
-    padding: 14px 16px;
-}
-.hist-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 7px;
-}
-.hist-mode {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #7c3aed;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-.hist-time {
-    color: #1e293b;
-    font-size: 0.66rem;
-    font-weight: 500;
-}
-.hist-text {
-    color: #334155;
-    font-size: 0.8rem;
-    line-height: 1.6;
-}
-
-/* ── BUTTONS ────────────────────────────────────────── */
-.stButton > button {
-    background: linear-gradient(135deg, #7c3aed, #6366f1) !important;
-    color: #fff !important;
-    border: none !important;
+/* ── Status / Alerts ── */
+.stAlert {
+    background: rgba(16, 185, 129, 0.06) !important;
+    border: 1px solid rgba(16, 185, 129, 0.2) !important;
     border-radius: 10px !important;
-    font-weight: 600 !important;
-    font-size: 0.8rem !important;
-    padding: 9px 20px !important;
-    letter-spacing: 0.02em !important;
-    transition: all 0.2s !important;
-    box-shadow: 0 2px 14px rgba(124,58,237,0.22) !important;
+    color: #6ee7b7 !important;
 }
-.stButton > button:hover {
-    background: linear-gradient(135deg, #6d28d9, #4f46e5) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 24px rgba(124,58,237,0.38) !important;
-}
-.stButton > button[kind="secondary"] {
-    background: rgba(255,255,255,0.04) !important;
-    color: #475569 !important;
-    box-shadow: none !important;
-    border: 1px solid rgba(255,255,255,0.07) !important;
-}
-.stButton > button[kind="secondary"]:hover {
-    background: rgba(255,255,255,0.07) !important;
-    color: #94a3b8 !important;
-}
+[data-testid="stNotification"] { border-radius: 10px !important; }
 
-/* Download icon button inside history — style the dl button */
-[data-testid="stDownloadButton"] button {
-    background: rgba(139,92,246,0.08) !important;
-    border: 1px solid rgba(139,92,246,0.18) !important;
-    color: #8b5cf6 !important;
-    box-shadow: none !important;
-    border-radius: 10px !important;
-    font-size: 1rem !important;
-    padding: 6px 10px !important;
-    font-weight: 700 !important;
-    transition: all 0.18s !important;
-    height: 100% !important;
-    min-height: 60px !important;
-}
-[data-testid="stDownloadButton"] button:hover {
-    background: rgba(139,92,246,0.18) !important;
-    border-color: rgba(139,92,246,0.4) !important;
-    transform: translateY(-1px) !important;
-}
-
-/* ── CHECKBOX ───────────────────────────────────────── */
+/* ── Checkbox ── */
 [data-testid="stCheckbox"] label {
-    color: #475569 !important;
+    color: #71717a !important;
     font-size: 0.8rem !important;
 }
+[data-testid="stCheckbox"] span[aria-checked="true"] {
+    background: #7c3aed !important;
+    border-color: #7c3aed !important;
+}
 
-/* ── SELECT ─────────────────────────────────────────── */
+/* ── Select Box ── */
 [data-testid="stSelectbox"] > div > div {
-    background: rgba(255,255,255,0.04) !important;
-    border: 1px solid rgba(255,255,255,0.08) !important;
-    border-radius: 10px !important;
-    color: #cbd5e1 !important;
+    background: #111113 !important;
+    border-color: #27272a !important;
+    color: #d4d4d8 !important;
+    border-radius: 8px !important;
 }
 
-/* ── CAPTION ────────────────────────────────────────── */
-.stCaption p, [data-testid="stCaptionContainer"] p {
-    color: #334155 !important;
-    font-size: 0.7rem !important;
-}
+/* ── Spinner ── */
+[data-testid="stSpinner"] { color: #7c3aed !important; }
 
-/* ── STATUS MESSAGES ────────────────────────────────── */
-.vtp-success {
+/* ── File caption ── */
+.file-meta {
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: rgba(16,185,129,0.07);
-    border: 1px solid rgba(16,185,129,0.18);
-    border-radius: 10px;
-    padding: 10px 14px;
-    color: #34d399;
-    font-size: 0.8rem;
-    font-weight: 500;
-    margin-bottom: 0.8rem;
-    animation: fadeUp 0.4s ease;
+    gap: 8px;
+    margin-top: 8px;
+    color: #3f3f46;
+    font-size: 0.72rem;
+    font-family: 'Geist Mono', monospace;
 }
-.vtp-error {
-    background: rgba(239,68,68,0.07);
-    border: 1px solid rgba(239,68,68,0.18);
-    border-radius: 10px;
-    padding: 10px 14px;
-    color: #f87171;
-    font-size: 0.8rem;
-    margin-bottom: 0.8rem;
-}
-.vtp-warn {
-    background: rgba(251,191,36,0.07);
-    border: 1px solid rgba(251,191,36,0.18);
-    border-radius: 10px;
-    padding: 10px 14px;
-    color: #fbbf24;
-    font-size: 0.8rem;
-    margin-bottom: 0.8rem;
+.file-dot {
+    width: 4px; height: 4px;
+    background: #3f3f46;
+    border-radius: 50%;
 }
 
-/* ── SCROLLBAR ──────────────────────────────────────── */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #4c1d95; border-radius: 10px; }
+/* ── Badge ── */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(124, 58, 237, 0.1);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    color: #a78bfa;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 20px;
+}
 
-/* ── DIVIDER ────────────────────────────────────────── */
-.vtp-hr {
+/* ── Divider ── */
+.vdivider {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(139,92,246,0.12), transparent);
-    margin: 1.8rem 0 1rem;
-    border: none;
+    background: linear-gradient(90deg, transparent 0%, #1f1f23 30%, #1f1f23 70%, transparent 100%);
+    margin: 1.5rem 0;
 }
 
-/* ── FOOTER ─────────────────────────────────────────── */
+/* ── Download icon button in history ── */
+.dl-icon-btn {
+    background: rgba(124, 58, 237, 0.08);
+    border: 1px solid rgba(124, 58, 237, 0.15);
+    border-radius: 8px;
+    width: 34px; height: 34px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    flex-shrink: 0;
+    color: #7c3aed;
+    font-size: 0.85rem;
+}
+.dl-icon-btn:hover {
+    background: rgba(124, 58, 237, 0.16);
+    border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* ── Footer ── */
 .vtp-footer {
     text-align: center;
-    color: #1e293b;
-    font-size: 0.6rem;
-    font-weight: 500;
-    letter-spacing: 0.8px;
-    padding-bottom: 1rem;
+    color: #27272a;
+    font-size: 0.65rem;
+    padding: 2rem 0 1rem;
+    letter-spacing: 0.04em;
 }
-.vtp-footer span { color: #6d28d9; }
+.vtp-footer strong { color: #3f3f46; }
 
-/* Hide Streamlit chrome */
-#MainMenu, footer, header { visibility: hidden; }
-[data-testid="stDecoration"] { display: none; }
+/* ── Audio recorder widget ── */
+[data-testid="stAudioInput"] {
+    background: transparent !important;
+}
+[data-testid="stAudioInput"] > div {
+    background: #0d0d10 !important;
+    border: 1px solid #1f1f23 !important;
+    border-radius: 12px !important;
+}
+
+/* hide top spacer Streamlit adds above file uploader label */
+[data-testid="stFileUploader"] section { display: none !important; }
+[data-testid="stFileUploader"] label { display: none !important; }
+
+/* Collapse empty markdown containers that create blank boxes */
+.stMarkdown:empty { display: none !important; }
+div[data-testid="stVerticalBlock"] > div:empty { display: none !important; }
+
+/* ── Global dark override for any leftover white backgrounds ── */
+.element-container { background: transparent !important; }
+.stTextInput > div, .stSelectbox > div { background: transparent !important; }
+
+/* Remove Streamlit's default top/bottom padding on containers */
+section[data-testid="stSidebar"] { display: none; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -395,20 +451,21 @@ if "last_processed_audio" not in st.session_state:
     st.session_state.last_processed_audio = None
 if "last_processed_file" not in st.session_state:
     st.session_state.last_processed_file = None
+if "show_translate" not in st.session_state:
+    st.session_state.show_translate = False
 
 # ============================================================
 # FUNCTIONS
 # ============================================================
 def translate_text(text, target_lang):
     lang_map = {
-        "Hindi": "Hindi", "Gujarati": "Gujarati",
-        "Spanish": "Spanish", "French": "French",
-        "German": "German", "Chinese": "Chinese", "Japanese": "Japanese"
+        "Hindi": "Hindi", "Gujarati": "Gujarati", "Spanish": "Spanish",
+        "French": "French", "German": "German", "Chinese": "Chinese", "Japanese": "Japanese"
     }
     language = lang_map.get(target_lang, "Hindi")
     url = "https://api.mistral.ai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {MISTRAL_KEY}", "Content-Type": "application/json"}
-    prompt = f"Translate the following text to {language}. Only output the translation.\n\nText:\n{text}"
+    prompt = f"Translate the following text to {language}. Only output the translation, no additional text.\n\nText:\n{text}"
     data = {"model": "mistral-small-latest", "messages": [{"role": "user", "content": prompt}], "max_tokens": 2000}
     try:
         response = requests.post(url, json=data, headers=headers, timeout=30)
@@ -420,7 +477,8 @@ def format_transcript(transcript, conversation_mode):
     if conversation_mode and transcript.utterances:
         formatted = ""
         for utterance in transcript.utterances:
-            formatted += f"**Speaker {utterance.speaker}:** {utterance.text}\n\n"
+            speaker = f"Speaker {utterance.speaker}"
+            formatted += f"**{speaker}:** {utterance.text}\n\n"
         return formatted
     return transcript.text
 
@@ -428,7 +486,7 @@ def add_to_history(text, full_text, mode):
     entry = {
         "text": text[:500] + ("..." if len(text) > 500 else ""),
         "full_text": full_text,
-        "time": datetime.now().strftime("%I:%M %p, %d %b"),
+        "time": datetime.now().strftime("%I:%M %p · %d %b"),
         "mode": mode
     }
     st.session_state.history.insert(0, entry)
@@ -439,39 +497,39 @@ def add_to_history(text, full_text, mode):
 # ============================================================
 st.markdown("""
 <div class="vtp-header">
-    <div class="vtp-badge">
-        <span class="dot"></span>
-        AI-Powered · Real-Time
-    </div>
+    <div class="vtp-logo-ring">🎙️</div>
     <div class="vtp-title">Voice to Text <span class="accent">Pro</span></div>
-    <div class="vtp-sub">Upload audio &nbsp;·&nbsp; Record live &nbsp;·&nbsp; Transcribe &nbsp;·&nbsp; Translate</div>
+    <div class="vtp-subtitle">
+        Upload audio or video
+        <span>·</span>
+        Record your voice
+        <span>·</span>
+        AI transcribes &amp; translates
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
-# ============================================================
-# STATUS MSG
-# ============================================================
+# Status banner
 if st.session_state.copy_msg:
-    st.markdown(f'<div class="vtp-success">✓ &nbsp;{st.session_state.copy_msg}</div>', unsafe_allow_html=True)
+    st.success(st.session_state.copy_msg)
     st.session_state.copy_msg = ""
 
 # ============================================================
-# RECORD SECTION  — no extra boxes, clean single card
+# RECORD SECTION  — no wrapper divs that create extra boxes
 # ============================================================
 st.markdown("""
-<div class="vtp-card">
-    <div class="vtp-card-label">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.2"
-             stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-            <line x1="12" y1="19" x2="12" y2="22"/>
-        </svg>
-        Record Voice
+<div class="card">
+    <div class="card-header">
+        <div class="card-icon">🎤</div>
+        <div>
+            <div class="card-label">Record Voice</div>
+            <div class="card-caption">Tap the mic and start speaking</div>
+        </div>
     </div>
+</div>
 """, unsafe_allow_html=True)
 
-audio_value = st.audio_input("record", key="audio_recorder", label_visibility="collapsed")
+audio_value = st.audio_input("", key="audio_recorder", label_visibility="collapsed")
 
 audio_hash = None
 if audio_value is not None:
@@ -492,58 +550,66 @@ if audio_value is not None and audio_hash != st.session_state.last_processed_aud
                 st.session_state.transcribed_text = formatted
                 st.session_state.original_text = transcript.text
                 add_to_history(formatted, formatted, "Conversation")
-                st.markdown('<div class="vtp-success">✓ &nbsp;Transcription complete!</div>', unsafe_allow_html=True)
+                st.success("Transcription complete")
             else:
-                st.markdown('<div class="vtp-error">⚠ No speech detected. Please try again.</div>', unsafe_allow_html=True)
+                st.error("No speech detected — please try again.")
         except Exception as e:
-            st.markdown(f'<div class="vtp-error">⚠ {str(e)}</div>', unsafe_allow_html=True)
+            st.error(f"Error: {str(e)}")
         finally:
             try:
-                if os.path.exists(temp_file): os.remove(temp_file)
-            except: pass
-
-st.markdown('</div>', unsafe_allow_html=True)
+                if os.path.exists(temp_file):
+                    os.remove(temp_file)
+            except:
+                pass
 
 # ============================================================
 # UPLOAD SECTION
 # ============================================================
 st.markdown("""
-<div class="vtp-card">
-    <div class="vtp-card-label">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.2"
-             stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="17 8 12 3 7 8"/>
-            <line x1="12" y1="3" x2="12" y2="15"/>
-        </svg>
-        Upload File
+<div class="card" style="margin-top:1rem;">
+    <div class="card-header">
+        <div class="card-icon">📂</div>
+        <div>
+            <div class="card-label">Upload File</div>
+            <div class="card-caption">MP3 · WAV · M4A · FLAC · WebM · MP4 · MOV · AVI · MKV</div>
+        </div>
     </div>
+</div>
 """, unsafe_allow_html=True)
 
-st.caption("MP3 · WAV · M4A · FLAC · WebM · MP4 · MOV · AVI · MKV")
-
 uploaded_file = st.file_uploader(
-    "upload", type=["mp3","wav","m4a","flac","webm","mp4","mov","avi","mkv"],
+    "Upload audio or video",
+    type=["mp3", "wav", "m4a", "flac", "webm", "mp4", "mov", "avi", "mkv"],
     label_visibility="collapsed"
 )
 
 if uploaded_file is not None:
     file_hash = hashlib.md5(uploaded_file.getvalue()).hexdigest()
     file_type = uploaded_file.type
-    if "video" in file_type or uploaded_file.name.lower().endswith((".mp4",".mov",".avi",".mkv")):
+    if "video" in file_type or uploaded_file.name.lower().endswith((".mp4", ".mov", ".avi", ".mkv")):
         st.video(uploaded_file)
     else:
         st.audio(uploaded_file, format="audio/wav")
 
     file_size = len(uploaded_file.getvalue()) / (1024 * 1024)
-    st.caption(f"📄 {uploaded_file.name}  ·  {file_size:.2f} MB")
+    st.markdown(f"""
+    <div class="file-meta">
+        <span>📄 {uploaded_file.name}</span>
+        <span class="file-dot"></span>
+        <span>{file_size:.1f} MB</span>
+    </div>
+    """, unsafe_allow_html=True)
 
-    conversation_mode = st.checkbox("Speaker labels (Conversation Mode)", value=True)
+    col_mode, col_btn = st.columns([2, 1])
+    with col_mode:
+        conversation_mode = st.checkbox("Speaker Labels (Conversation Mode)", value=True)
+    with col_btn:
+        transcribe_clicked = st.button("✦ Transcribe", type="primary", use_container_width=True)
 
-    if st.button("Transcribe", type="primary", use_container_width=True):
+    if transcribe_clicked:
         if file_hash != st.session_state.last_processed_file:
             st.session_state.last_processed_file = file_hash
-            with st.spinner("Processing audio…"):
+            with st.spinner("Uploading & transcribing…"):
                 try:
                     file_ext = uploaded_file.name.split('.')[-1]
                     temp_file = f"temp_upload.{file_ext}"
@@ -559,74 +625,54 @@ if uploaded_file is not None:
                         st.session_state.translated_text = ""
                         mode = "Conversation" if conversation_mode else "Standard"
                         add_to_history(formatted, formatted, mode)
-                        st.markdown('<div class="vtp-success">✓ &nbsp;Transcription complete!</div>', unsafe_allow_html=True)
+                        st.success("Transcription complete")
                     else:
-                        st.markdown('<div class="vtp-error">⚠ No speech detected.</div>', unsafe_allow_html=True)
+                        st.error("No speech detected — please try again.")
                 except Exception as e:
-                    st.markdown(f'<div class="vtp-error">⚠ {str(e)}</div>', unsafe_allow_html=True)
+                    st.error(f"Error: {str(e)}")
                 finally:
                     try:
-                        if os.path.exists(temp_file): os.remove(temp_file)
-                    except: pass
+                        if os.path.exists(temp_file):
+                            os.remove(temp_file)
+                    except:
+                        pass
         else:
-            st.markdown('<div class="vtp-warn">⚠ This file has already been transcribed.</div>', unsafe_allow_html=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
+            st.warning("This file has already been transcribed.")
 
 # ============================================================
 # TRANSCRIPTION OUTPUT
 # ============================================================
 if st.session_state.transcribed_text:
-    st.markdown("""
-    <div class="vtp-section">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/>
-            <line x1="16" y1="17" x2="8" y2="17"/>
-        </svg>
-        Transcription
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown(f'<div class="vtp-textbox">{st.session_state.transcribed_text}</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label">Transcription</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="text-box">{st.session_state.transcribed_text}</div>', unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
     with col1:
         st.download_button(
-            label="↓  Download",
+            label="↓ Download",
             data=st.session_state.transcribed_text,
-            file_name=f"transcription_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
+            file_name=f"transcript_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
             mime="text/plain",
             use_container_width=True,
-            key="download_btn_main"
+            key="download_main"
         )
     with col2:
-        if st.button("✕  Clear", key="clear_transcription", use_container_width=True, type="secondary"):
+        if st.button("✕ Clear", key="clear_transcription", use_container_width=True):
             st.session_state.transcribed_text = ""
             st.session_state.original_text = ""
             st.session_state.translated_text = ""
+            st.session_state.show_translate = False
             st.rerun()
     with col3:
-        if st.button("⇄  Translate", key="translate_btn", use_container_width=True):
-            st.session_state.show_translate = not st.session_state.get("show_translate", False)
+        if st.button("⇄ Translate", key="translate_btn", use_container_width=True):
+            st.session_state.show_translate = not st.session_state.show_translate
             st.rerun()
 
 # ============================================================
 # TRANSLATION
 # ============================================================
-if st.session_state.get("show_translate", False) and st.session_state.transcribed_text:
-    st.markdown("""
-    <div class="vtp-section">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="2" y1="12" x2="22" y2="12"/>
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-        </svg>
-        Translate
-    </div>
-    """, unsafe_allow_html=True)
-
+if st.session_state.show_translate and st.session_state.transcribed_text:
+    st.markdown('<div class="section-label">Translation</div>', unsafe_allow_html=True)
     col1, col2 = st.columns([3, 1])
     with col1:
         target_lang = st.selectbox(
@@ -635,66 +681,57 @@ if st.session_state.get("show_translate", False) and st.session_state.transcribe
             label_visibility="collapsed"
         )
     with col2:
-        translate_btn = st.button("Go →", type="primary", use_container_width=True)
+        do_translate = st.button("Go", type="primary", use_container_width=True)
 
-    if translate_btn:
-        with st.spinner("Translating…"):
+    if do_translate:
+        with st.spinner(f"Translating to {target_lang}…"):
             translated = translate_text(st.session_state.transcribed_text, target_lang)
             if translated:
                 st.session_state.translated_text = translated
-                st.markdown(f'<div class="vtp-textbox vtp-textbox-translated">{translated}</div>', unsafe_allow_html=True)
-                st.download_button(
-                    label="↓  Download Translation",
-                    data=translated,
-                    file_name=f"translation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
-                    mime="text/plain",
-                    key="download_translation_btn",
-                    use_container_width=True
-                )
+
+    if st.session_state.translated_text:
+        st.markdown(f'<div class="text-box" style="border-color:#2d2317;">{st.session_state.translated_text}</div>', unsafe_allow_html=True)
+        col_a, col_b = st.columns(2)
+        with col_a:
+            st.download_button(
+                label="↓ Download Translation",
+                data=st.session_state.translated_text,
+                file_name=f"translation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
+                mime="text/plain",
+                use_container_width=True,
+                key="dl_translation"
+            )
 
 # ============================================================
-# HISTORY  — download icon on the RIGHT side of each item
+# HISTORY — with inline download icon on right side
 # ============================================================
 if st.session_state.history:
-    st.markdown("""
-    <div class="vtp-section">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <polyline points="1 4 1 10 7 10"/>
-            <path d="M3.51 15a9 9 0 1 0 .49-3.78"/>
-        </svg>
-        History
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="section-label">History</div>', unsafe_allow_html=True)
 
     for idx, item in enumerate(st.session_state.history):
-        col_body, col_dl = st.columns([11, 1])
-
-        with col_body:
+        # History card with meta on left, download on right (via Streamlit columns)
+        col_text, col_dl = st.columns([9, 1])
+        with col_text:
             st.markdown(f"""
-            <div class="hist-wrap" style="margin-bottom:0;">
-                <div class="hist-body">
-                    <div class="hist-header-row">
-                        <span class="hist-mode">{item['mode']}</span>
-                        <span class="hist-time">{item['time']}</span>
-                    </div>
-                    <div class="hist-text">{item['text']}</div>
-                </div>
+            <div class="history-item">
+                <div class="history-mode">{item['mode']}</div>
+                <div class="history-time">{item['time']}</div>
+                <div class="history-text">{item['text']}</div>
             </div>
             """, unsafe_allow_html=True)
-
         with col_dl:
-            # Icon-only download button aligned with the card
+            st.markdown("<div style='height:14px'></div>", unsafe_allow_html=True)
             st.download_button(
                 label="↓",
                 data=item.get('full_text', item['text']),
-                file_name=f"transcript_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
+                file_name=f"transcript_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{idx}.txt",
                 mime="text/plain",
-                key=f"dl_hist_{idx}",
                 use_container_width=True,
+                key=f"dl_hist_{idx}"
             )
 
-    st.markdown("<div style='height:0.8rem'></div>", unsafe_allow_html=True)
-    if st.button("Clear All History", use_container_width=True, type="secondary"):
+    st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
+    if st.button("✕ Clear All History", use_container_width=True):
         st.session_state.history = []
         save_history(st.session_state.history)
         st.rerun()
@@ -702,5 +739,8 @@ if st.session_state.history:
 # ============================================================
 # FOOTER
 # ============================================================
-st.markdown('<div class="vtp-hr"></div>', unsafe_allow_html=True)
-st.markdown('<div class="vtp-footer">✦ Voice to Text Pro &nbsp;·&nbsp; AssemblyAI + Mistral &nbsp;·&nbsp; <span>by Nirbhay</span></div>', unsafe_allow_html=True)
+st.markdown("""
+<div class="vtp-footer">
+    Voice to Text Pro &nbsp;·&nbsp; <strong>AssemblyAI</strong> + <strong>Mistral</strong> &nbsp;·&nbsp; by Nirbhay
+</div>
+""", unsafe_allow_html=True)
