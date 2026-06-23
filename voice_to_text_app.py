@@ -468,7 +468,7 @@ if st.session_state.get("show_translate", False) and st.session_state.original_t
                     )
 
 # ============================================================
-# HISTORY
+# HISTORY WITH FIXED COPY/DOWNLOAD
 # ============================================================
 if st.session_state.history:
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
@@ -476,6 +476,7 @@ if st.session_state.history:
     
     for idx, item in enumerate(reversed(st.session_state.history)):
         short_text = item['full_text'][:200] + ('...' if len(item['full_text']) > 200 else '')
+        safe_text = item['full_text'].replace('`', '\\`').replace('"', '\\"').replace("'", "\\'")
         
         st.markdown(f"""
         <div class="history-item">
@@ -490,7 +491,7 @@ if st.session_state.history:
                 {short_text}
             </div>
             <div style="display: flex; gap: 8px; margin-top: 10px;">
-                <button onclick="navigator.clipboard.writeText(`{item['full_text'].replace('`', '\\`').replace('"', '\\"')}`)" style="background: #f1f5f9; border: none; border-radius: 6px; padding: 4px 12px; font-size: 0.7rem; cursor: pointer; color: #475569;">📋 Copy</button>
+                <button onclick="navigator.clipboard.writeText(`{safe_text}`)" style="background: #f1f5f9; border: none; border-radius: 6px; padding: 4px 12px; font-size: 0.7rem; cursor: pointer; color: #475569;">📋 Copy</button>
                 <a href="data:text/plain;charset=utf-8,{item['full_text'].replace('\n', '%0A').replace(' ', '%20')}" download="transcription_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt" style="background: #f1f5f9; border: none; border-radius: 6px; padding: 4px 12px; font-size: 0.7rem; text-decoration: none; color: #475569; cursor: pointer;">📥 Download</a>
             </div>
         </div>
