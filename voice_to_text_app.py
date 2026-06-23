@@ -37,9 +37,12 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Syne:wght@700;800&display=swap');
 
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
 
-.stApp { background:#07070e; min-height:100vh; }
+.stApp {
+    background: linear-gradient(135deg, #f0f4ff 0%, #ffffff 50%, #f5f0ff 100%);
+    min-height:100vh;
+}
 
 .block-container {
     padding: 2.5rem 2rem 5rem 2rem !important;
@@ -56,9 +59,9 @@ st.markdown("""
     0%   { background-position:-200% center; }
     100% { background-position:200% center; }
 }
-@keyframes pulse {
-    0%,100% { opacity:1; }
-    50%      { opacity:0.4; }
+@keyframes waveAnim {
+    0%,100% { transform:scaleY(0.3); }
+    50% { transform:scaleY(1); }
 }
 
 .tr-header { text-align:center; padding:2.8rem 0 2.2rem; animation:fadeUp 0.7s ease both; }
@@ -69,7 +72,7 @@ st.markdown("""
     border-radius:100px;
     padding:5px 16px;
     font-size:0.65rem; font-weight:700;
-    color:#a78bfa; letter-spacing:2.5px; text-transform:uppercase;
+    color:#7c3aed; letter-spacing:2.5px; text-transform:uppercase;
     margin-bottom:1.4rem;
 }
 .tr-badge .live-dot {
@@ -83,84 +86,107 @@ st.markdown("""
     letter-spacing:-0.05em; line-height:1;
     margin-bottom:0.5rem;
 }
-.tr-logo .w { color:#e2e8f0; }
+.tr-logo .w { color:#1e293b; }
 .tr-logo .acc {
-    background:linear-gradient(135deg,#8b5cf6 0%,#6366f1 55%,#38bdf8 100%);
+    background:linear-gradient(135deg,#7c3aed 0%,#4f46e5 55%,#06b6d4 100%);
     background-size:200% auto;
     -webkit-background-clip:text; -webkit-text-fill-color:transparent;
     animation:shimmer 5s linear infinite;
 }
-.tr-tagline { 
-    color: #94a3b8; 
-    font-size:0.8rem; 
-    letter-spacing:0.04em; 
-}
+.tr-tagline { color:#64748b; font-size:0.8rem; letter-spacing:0.04em; }
 .tr-pills {
     display:flex; justify-content:center; gap:8px; flex-wrap:wrap;
     margin-top:1.2rem;
 }
 .tr-pill {
     display:inline-flex; align-items:center; gap:5px;
-    background:rgba(255,255,255,0.03);
-    border:1px solid rgba(255,255,255,0.07);
+    background:rgba(139,92,246,0.06);
+    border:1px solid rgba(139,92,246,0.12);
     border-radius:100px; padding:4px 12px;
-    font-size:0.68rem; font-weight:500; color:#94a3b8;
+    font-size:0.68rem; font-weight:500; color:#4b5563;
 }
 
-.tab-bar {
-    display:flex; gap:4px;
-    background:rgba(255,255,255,0.025);
-    border:1px solid rgba(255,255,255,0.06);
-    border-radius:14px; padding:5px; margin-bottom:1.4rem;
+/* ─── WAVE ANIMATION ─────────────────────────────── */
+.wave-container {
+    display:flex; justify-content:center; align-items:center;
+    gap:4px; height:60px; margin:1.5rem 0;
 }
-.tab-btn {
-    flex:1; text-align:center;
-    padding:10px 0; border-radius:10px;
-    font-size:0.78rem; font-weight:600;
-    cursor:pointer; transition:all 0.2s;
-    color:#334155; border:none; background:transparent;
+.wave-bar {
+    width:4px; height:12px; border-radius:4px;
+    background: linear-gradient(to top, #7c3aed, #4f46e5, #06b6d4);
+    animation: waveAnim 1.2s ease-in-out infinite;
+    transition: height 0.1s;
 }
-.tab-btn.active {
-    background:linear-gradient(135deg,#7c3aed,#6366f1);
-    color:#fff;
-    box-shadow:0 2px 12px rgba(124,58,237,0.3);
+.wave-bar:nth-child(1) { animation-delay:0.00s; height:16px; }
+.wave-bar:nth-child(2) { animation-delay:0.08s; height:24px; }
+.wave-bar:nth-child(3) { animation-delay:0.16s; height:32px; }
+.wave-bar:nth-child(4) { animation-delay:0.24s; height:40px; }
+.wave-bar:nth-child(5) { animation-delay:0.32s; height:48px; }
+.wave-bar:nth-child(6) { animation-delay:0.24s; height:40px; }
+.wave-bar:nth-child(7) { animation-delay:0.16s; height:32px; }
+.wave-bar:nth-child(8) { animation-delay:0.08s; height:24px; }
+.wave-bar:nth-child(9) { animation-delay:0.00s; height:16px; }
+.wave-bar:nth-child(10) { animation-delay:0.12s; height:20px; }
+.wave-bar:nth-child(11) { animation-delay:0.20s; height:28px; }
+.wave-bar:nth-child(12) { animation-delay:0.28s; height:36px; }
+
+.wave-bar.active {
+    animation-duration: 0.6s;
 }
 
+.wave-status {
+    text-align:center; color:#94a3b8; font-size:0.7rem;
+    letter-spacing:0.04em; margin-top:0.2rem;
+}
+.wave-status.active { color:#7c3aed; font-weight:600; }
+
+/* ─── INPUT PANEL ───────────────────────────────── */
 .input-panel {
-    background:rgba(255,255,255,0.022);
-    border:1px solid rgba(255,255,255,0.07);
+    background:rgba(255,255,255,0.7);
+    backdrop-filter:blur(12px);
+    border:1px solid rgba(139,92,246,0.12);
     border-radius:18px; padding:1.8rem 1.8rem 1.4rem;
     margin-bottom:1.2rem; animation:fadeUp 0.5s ease both;
     transition:border-color 0.25s;
 }
-.input-panel:hover { border-color:rgba(139,92,246,0.18); }
+.input-panel:hover { border-color:rgba(139,92,246,0.25); }
 .panel-title {
-    font-size:0.68rem; font-weight:700; 
-    color: #cbd5e1;
+    font-size:0.68rem; font-weight:700; color:#334155;
     text-transform:uppercase; letter-spacing:2px;
     margin-bottom:1.1rem;
     display:flex; align-items:center; gap:8px;
 }
 .panel-title svg { flex-shrink:0; }
 
+/* ─── DURATION SLIDER ────────────────────────────── */
+[data-testid="stSlider"] {
+    padding:0.5rem 0;
+}
+[data-testid="stSlider"] .stSliderLabel {
+    color:#475569 !important;
+    font-size:0.75rem !important;
+}
+[data-testid="stSlider"] .stSliderValue {
+    color:#7c3aed !important;
+    font-weight:600 !important;
+}
+
 .rec-hint {
-    color: #94a3b8; 
-    font-size:0.75rem; text-align:center;
+    color:#64748b; font-size:0.75rem; text-align:center;
     padding:0.4rem 0 0.8rem; letter-spacing:0.02em;
 }
 
 [data-testid="stFileUploader"] {
-    background:rgba(255,255,255,0.015) !important;
-    border: 1px solid rgba(255,255,255,0.06) !important;
+    background:rgba(255,255,255,0.4) !important;
+    border:1.5px dashed rgba(139,92,246,0.2) !important;
     border-radius:12px !important;
     transition:border-color 0.2s !important;
 }
 [data-testid="stFileUploader"]:hover {
-    border-color:rgba(139,92,246,0.3) !important;
-    background:rgba(139,92,246,0.03) !important;
+    border-color:rgba(139,92,246,0.4) !important;
+    background:rgba(139,92,246,0.05) !important;
 }
-[data-testid="stFileUploader"] span { color:#94a3b8 !important; }
-[data-testid="stFileUploader"] .stFileUploaderLabel { color:#94a3b8 !important; }
+[data-testid="stFileUploader"] span { color:#475569 !important; }
 
 [data-testid="stVideo"],[data-testid="stAudio"] {
     width:100% !important; border-radius:12px !important;
@@ -168,17 +194,17 @@ st.markdown("""
 }
 
 .tr-box {
-    background:rgba(255,255,255,0.022);
-    border:1px solid rgba(255,255,255,0.07);
+    background:rgba(255,255,255,0.85);
+    border:1px solid rgba(139,92,246,0.12);
     border-radius:14px;
     padding:20px 22px;
     min-height:150px; max-height:480px;
-    color:#d1d5db; font-size:0.88rem; line-height:1.85;
+    color:#1e293b; font-size:0.88rem; line-height:1.85;
     white-space:pre-wrap; overflow-y:auto;
     animation:fadeUp 0.5s ease both;
     margin-bottom:0;
 }
-.tr-box-gold { border-color:rgba(251,191,36,0.18) !important; }
+.tr-box-gold { border-color:rgba(251,191,36,0.25) !important; }
 
 .action-row {
     display:grid; grid-template-columns:1fr 1fr 1fr;
@@ -197,28 +223,27 @@ st.markdown("""
 
 .tr-section {
     display:flex; align-items:center; gap:9px;
-    color: #94a3b8; 
-    font-size:0.64rem; font-weight:700;
+    color:#64748b; font-size:0.64rem; font-weight:700;
     text-transform:uppercase; letter-spacing:2.5px;
     margin:2rem 0 1rem;
 }
 .tr-section::after {
     content:''; flex:1; height:1px;
-    background:rgba(255,255,255,0.05);
+    background:rgba(139,92,246,0.12);
 }
 
 .hist-card {
     display:flex; align-items:stretch;
-    background:rgba(255,255,255,0.028);
-    border:1px solid rgba(255,255,255,0.07);
+    background:rgba(255,255,255,0.6);
+    border:1px solid rgba(139,92,246,0.08);
     border-radius:16px; overflow:hidden;
     margin-bottom:10px;
     transition:border-color 0.2s, background 0.2s;
     animation:fadeUp 0.4s ease both;
 }
 .hist-card:hover {
-    border-color:rgba(139,92,246,0.22);
-    background:rgba(139,92,246,0.03);
+    border-color:rgba(139,92,246,0.2);
+    background:rgba(255,255,255,0.8);
 }
 .hist-main { flex:1; padding:14px 16px; min-width:0; }
 .hist-top {
@@ -227,37 +252,24 @@ st.markdown("""
 }
 .hist-badge {
     font-size:0.62rem; font-weight:800;
-    color:#a78bfa; text-transform:uppercase; letter-spacing:1.5px;
-    background:rgba(124,58,237,0.12);
-    border:1px solid rgba(124,58,237,0.2);
+    color:#7c3aed; text-transform:uppercase; letter-spacing:1.5px;
+    background:rgba(124,58,237,0.08);
+    border:1px solid rgba(124,58,237,0.15);
     border-radius:6px; padding:2px 8px;
 }
-.hist-time { 
-    color: #94a3b8; 
-    font-size:0.65rem; font-weight:500; 
-}
+.hist-time { color:#94a3b8; font-size:0.65rem; font-weight:500; }
 .hist-preview {
-    color:#cbd5e1; 
-    font-size:0.8rem; line-height:1.55;
+    color:#475569; font-size:0.8rem; line-height:1.55;
     overflow:hidden;
     display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
 }
-.hist-dl-side {
-    width:52px; min-width:52px;
-    background:rgba(139,92,246,0.06);
-    border-left:1px solid rgba(139,92,246,0.1);
-    display:flex; align-items:center; justify-content:center;
-    transition:background 0.2s;
-    cursor:pointer;
-}
-.hist-dl-side:hover { background:rgba(139,92,246,0.14); }
 
 .hist-dl-col [data-testid="stDownloadButton"] button {
-    background:rgba(139,92,246,0.07) !important;
+    background:rgba(139,92,246,0.06) !important;
     border:none !important;
-    border-left:1px solid rgba(139,92,246,0.12) !important;
+    border-left:1px solid rgba(139,92,246,0.1) !important;
     border-radius:0 !important;
-    color:#8b5cf6 !important;
+    color:#7c3aed !important;
     font-size:1.1rem !important; font-weight:700 !important;
     height:100% !important; min-height:72px !important;
     width:100% !important;
@@ -265,94 +277,87 @@ st.markdown("""
     transition:background 0.2s !important;
 }
 .hist-dl-col [data-testid="stDownloadButton"] button:hover {
-    background:rgba(139,92,246,0.18) !important;
+    background:rgba(139,92,246,0.14) !important;
 }
 
 .stButton > button {
-    background:linear-gradient(135deg,#7c3aed,#6366f1) !important;
+    background:linear-gradient(135deg,#7c3aed,#4f46e5) !important;
     color:#fff !important; border:none !important;
     border-radius:10px !important; font-weight:600 !important;
     font-size:0.8rem !important;
     letter-spacing:0.02em !important;
     transition:all 0.2s !important;
-    box-shadow:0 2px 12px rgba(124,58,237,0.2) !important;
+    box-shadow:0 2px 12px rgba(124,58,237,0.15) !important;
 }
 .stButton > button:hover {
-    background:linear-gradient(135deg,#6d28d9,#4f46e5) !important;
+    background:linear-gradient(135deg,#6d28d9,#4338ca) !important;
     transform:translateY(-1px) !important;
-    box-shadow:0 4px 22px rgba(124,58,237,0.36) !important;
+    box-shadow:0 4px 22px rgba(124,58,237,0.25) !important;
 }
 .stButton > button[kind="secondary"] {
-    background:rgba(255,255,255,0.04) !important;
-    color:#94a3b8 !important; box-shadow:none !important;
-    border:1px solid rgba(255,255,255,0.08) !important;
+    background:rgba(255,255,255,0.5) !important;
+    color:#475569 !important; box-shadow:none !important;
+    border:1px solid rgba(139,92,246,0.15) !important;
 }
 .stButton > button[kind="secondary"]:hover {
-    background:rgba(255,255,255,0.08) !important;
-    color:#cbd5e1 !important; transform:none !important;
+    background:rgba(255,255,255,0.8) !important;
+    color:#1e293b !important;
 }
 [data-testid="stDownloadButton"] button {
-    background:linear-gradient(135deg,#7c3aed,#6366f1) !important;
+    background:linear-gradient(135deg,#7c3aed,#4f46e5) !important;
     color:#fff !important; border:none !important;
     border-radius:10px !important; font-weight:600 !important;
-    font-size:0.8rem !important; box-shadow:0 2px 12px rgba(124,58,237,0.2) !important;
+    font-size:0.8rem !important; box-shadow:0 2px 12px rgba(124,58,237,0.15) !important;
     transition:all 0.2s !important;
 }
 [data-testid="stDownloadButton"] button:hover {
-    background:linear-gradient(135deg,#6d28d9,#4f46e5) !important;
+    background:linear-gradient(135deg,#6d28d9,#4338ca) !important;
     transform:translateY(-1px) !important;
-    box-shadow:0 4px 22px rgba(124,58,237,0.36) !important;
 }
 
-[data-testid="stCheckbox"] label { 
-    color: #cbd5e1 !important; 
-    font-size:0.8rem !important; 
-}
+[data-testid="stCheckbox"] label { color:#475569 !important; font-size:0.8rem !important; }
 
 [data-testid="stSelectbox"] > div > div {
-    background:rgba(255,255,255,0.04) !important;
-    border:1px solid rgba(255,255,255,0.09) !important;
-    border-radius:10px !important; color:#cbd5e1 !important;
+    background:rgba(255,255,255,0.5) !important;
+    border:1px solid rgba(139,92,246,0.15) !important;
+    border-radius:10px !important; color:#1e293b !important;
 }
-[data-testid="stSelectbox"] select { color:#cbd5e1 !important; }
+[data-testid="stSelectbox"] select { color:#1e293b !important; }
 
-.stCaption p,[data-testid="stCaptionContainer"] p { 
-    color: #94a3b8 !important; 
-    font-size:0.7rem !important; 
-}
+.stCaption p,[data-testid="stCaptionContainer"] p { color:#94a3b8 !important; font-size:0.7rem !important; }
 
 .tr-ok {
     display:flex; align-items:center; gap:10px;
-    background:rgba(16,185,129,0.07); border:1px solid rgba(16,185,129,0.18);
-    border-radius:10px; padding:10px 14px; color:#34d399;
+    background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.15);
+    border-radius:10px; padding:10px 14px; color:#065f46;
     font-size:0.8rem; font-weight:500; margin:0.7rem 0;
     animation:fadeUp 0.4s ease;
 }
 .tr-err {
-    background:rgba(239,68,68,0.07); border:1px solid rgba(239,68,68,0.18);
-    border-radius:10px; padding:10px 14px; color:#f87171;
+    background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.15);
+    border-radius:10px; padding:10px 14px; color:#991b1b;
     font-size:0.8rem; margin:0.7rem 0;
 }
 .tr-warn {
-    background:rgba(251,191,36,0.07); border:1px solid rgba(251,191,36,0.18);
-    border-radius:10px; padding:10px 14px; color:#fbbf24;
+    background:rgba(251,191,36,0.06); border:1px solid rgba(251,191,36,0.15);
+    border-radius:10px; padding:10px 14px; color:#92400e;
     font-size:0.8rem; margin:0.7rem 0;
 }
 
 ::-webkit-scrollbar { width:4px; }
 ::-webkit-scrollbar-track { background:transparent; }
-::-webkit-scrollbar-thumb { background:#4c1d95; border-radius:10px; }
+::-webkit-scrollbar-thumb { background:#7c3aed; border-radius:10px; }
 
 .tr-footer {
     text-align:center; color:#94a3b8;
     font-size:0.6rem; font-weight:500; letter-spacing:1px;
     padding:1.5rem 0 0.5rem;
 }
-.tr-footer em { color:#6d28d9; font-style:normal; }
+.tr-footer em { color:#7c3aed; font-style:normal; font-weight:600; }
 
 .tr-hr {
     height:1px;
-    background:linear-gradient(90deg,transparent,rgba(139,92,246,0.12),transparent);
+    background:linear-gradient(90deg,transparent,rgba(139,92,246,0.15),transparent);
     margin:2rem 0 0; border:none;
 }
 .spacer-sm { height:0.6rem; }
@@ -370,6 +375,7 @@ if "last_processed_audio"  not in st.session_state: st.session_state.last_proces
 if "last_processed_file"   not in st.session_state: st.session_state.last_processed_file   = None
 if "show_translate"        not in st.session_state: st.session_state.show_translate        = False
 if "input_mode"            not in st.session_state: st.session_state.input_mode            = "record"
+if "duration_minutes"      not in st.session_state: st.session_state.duration_minutes      = 0
 
 # ─── HELPERS ────────────────────────────────────────────────
 def translate_text(text, target_lang):
@@ -382,8 +388,8 @@ def translate_text(text, target_lang):
     try:
         r = requests.post(url,json=data,headers=headers,timeout=60)
         return r.json()["choices"][0]["message"]["content"]
-    except:
-        return "Translation failed."
+    except Exception as e:
+        return f"Translation failed: {str(e)}"
 
 def format_transcript(transcript, conversation_mode):
     if conversation_mode and transcript.utterances:
@@ -398,8 +404,14 @@ def add_to_history(text, full_text, mode):
     st.session_state.history.insert(0, entry)
     save_history(st.session_state.history)
 
-def do_transcribe(file_path, conversation_mode, mode_label):
+def do_transcribe(file_path, conversation_mode, mode_label, duration_minutes=0):
     config = aai.TranscriptionConfig(speaker_labels=True, speakers_expected=2)
+    
+    # If duration is set, use audio_start_from and audio_end_at
+    if duration_minutes > 0:
+        config.audio_start_from = 0
+        config.audio_end_at = duration_minutes * 60  # Convert to seconds
+    
     transcriber = aai.Transcriber(config=config)
     transcript = transcriber.transcribe(file_path)
     if transcript.text:
@@ -407,7 +419,8 @@ def do_transcribe(file_path, conversation_mode, mode_label):
         st.session_state.transcribed_text = formatted
         st.session_state.original_text    = transcript.text
         st.session_state.translated_text  = ""
-        add_to_history(formatted, formatted, mode_label)
+        mode_text = f"{mode_label} ({duration_minutes}m)" if duration_minutes > 0 else mode_label
+        add_to_history(formatted, formatted, mode_text)
         return True
     return False
 
@@ -430,6 +443,25 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# ─── WAVE ANIMATION ──────────────────────────────────────────
+st.markdown("""
+<div class="wave-container" id="waveContainer">
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+</div>
+<div class="wave-status" id="waveStatus">🎤 Ready to transcribe</div>
+""", unsafe_allow_html=True)
+
 # ─── TAB SWITCHER ────────────────────────────────────────────
 col_t1, col_t2, col_t3 = st.columns(3)
 with col_t1:
@@ -448,12 +480,20 @@ with col_t3:
         st.session_state.input_mode = "url"
         st.rerun()
 
+# ─── DURATION SLIDER ──────────────────────────────────────────
+st.markdown("### ⏱️ Duration")
+duration_minutes = st.slider(
+    "Select duration to transcribe (0 = full file)",
+    min_value=0, max_value=30, value=0, step=1
+)
+st.caption(f"{'Full file' if duration_minutes == 0 else f'First {duration_minutes} minute(s)'}")
+
 # ─── RECORD PANEL ────────────────────────────────────────────
 if st.session_state.input_mode == "record":
     st.markdown("""
     <div class="input-panel">
       <div class="panel-title">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.2"
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.2"
              stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
           <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
@@ -473,9 +513,10 @@ if st.session_state.input_mode == "record":
             try:
                 tmp = "temp_audio.wav"
                 with open(tmp,"wb") as f: f.write(audio_value.getvalue())
-                ok = do_transcribe(tmp, True, "Conversation")
+                ok = do_transcribe(tmp, True, "Conversation", duration_minutes)
                 if ok:
                     st.markdown('<div class="tr-ok">✓ &nbsp;Transcription complete!</div>', unsafe_allow_html=True)
+                    st.markdown('<script>document.getElementById("waveStatus").innerHTML = "✅ Transcription complete!"</script>', unsafe_allow_html=True)
                 else:
                     st.markdown('<div class="tr-err">⚠ No speech detected.</div>', unsafe_allow_html=True)
             except Exception as e:
@@ -491,7 +532,7 @@ elif st.session_state.input_mode == "upload":
     st.markdown("""
     <div class="input-panel">
       <div class="panel-title">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.2"
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.2"
              stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
           <polyline points="17 8 12 3 7 8"/>
@@ -523,7 +564,7 @@ elif st.session_state.input_mode == "upload":
                         tmp = f"temp_upload.{ext}"
                         with open(tmp,"wb") as f: f.write(uploaded_file.getbuffer())
                         mode = "Conversation" if conversation_mode else "Standard"
-                        ok = do_transcribe(tmp, conversation_mode, mode)
+                        ok = do_transcribe(tmp, conversation_mode, mode, duration_minutes)
                         if ok:
                             st.markdown('<div class="tr-ok">✓ &nbsp;Transcription complete!</div>', unsafe_allow_html=True)
                         else:
@@ -543,7 +584,7 @@ else:
     st.markdown("""
     <div class="input-panel">
       <div class="panel-title">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.2"
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.2"
              stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/>
           <line x1="2" y1="12" x2="22" y2="12"/>
@@ -561,19 +602,18 @@ else:
     if st.button("Transcribe from URL", type="primary", use_container_width=True) and url_input:
         with st.spinner("Processing…"):
             try:
-                # Determine if it's a Google Drive link
                 if "drive.google.com" in url_input:
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_file:
                         temp_path = tmp_file.name
-                    # Download from Google Drive
                     gdown.download(url_input, temp_path, quiet=False)
                     file_path = temp_path
                 else:
-                    # Direct URL – let AssemblyAI handle it
                     file_path = url_input
 
-                # Transcribe
                 config = aai.TranscriptionConfig(speaker_labels=True, speakers_expected=2)
+                if duration_minutes > 0:
+                    config.audio_start_from = 0
+                    config.audio_end_at = duration_minutes * 60
                 transcriber = aai.Transcriber(config=config)
                 transcript = transcriber.transcribe(file_path)
 
@@ -583,20 +623,18 @@ else:
                     st.session_state.original_text = transcript.text
                     st.session_state.translated_text = ""
                     mode = "Conversation" if conversation_mode else "Standard"
-                    add_to_history(formatted, formatted, mode)
+                    mode_text = f"{mode} ({duration_minutes}m)" if duration_minutes > 0 else mode
+                    add_to_history(formatted, formatted, mode_text)
                     st.markdown('<div class="tr-ok">✓ &nbsp;Transcription complete!</div>', unsafe_allow_html=True)
                 else:
-                    st.markdown('<div class="tr-err">⚠ No speech detected. Make sure the file is publicly accessible.</div>', unsafe_allow_html=True)
+                    st.markdown('<div class="tr-err">⚠ No speech detected.</div>', unsafe_allow_html=True)
 
             except Exception as e:
                 st.markdown(f'<div class="tr-err">⚠ {str(e)}</div>', unsafe_allow_html=True)
             finally:
-                # Clean up temp file if created
                 if 'temp_path' in locals() and os.path.exists(temp_path):
-                    try:
-                        os.remove(temp_path)
-                    except:
-                        pass
+                    try: os.remove(temp_path)
+                    except: pass
 
     st.markdown('</div>', unsafe_allow_html=True)
 
