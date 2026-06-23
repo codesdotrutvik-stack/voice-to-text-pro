@@ -5,7 +5,6 @@ import os
 import requests
 import json
 import hashlib
-import re
 import gdown
 import tempfile
 
@@ -39,10 +38,7 @@ st.markdown("""
 
 * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
 
-.stApp {
-    background: #0a0a12;
-    min-height:100vh;
-}
+.stApp { background: #0a0a12; min-height:100vh; }
 
 .block-container {
     padding: 2.5rem 2rem 5rem 2rem !important;
@@ -164,24 +160,6 @@ st.markdown("""
 }
 .panel-title svg { flex-shrink:0; }
 
-.duration-box {
-    background: rgba(6,182,212,0.06);
-    border:1px solid rgba(6,182,212,0.15);
-    border-radius:12px;
-    padding:0.8rem 1.2rem;
-    margin:0.8rem 0;
-            display : none;
-}
-.duration-box:hover {
-    border-color:rgba(6,182,212,0.3);
-    background: rgba(6,182,212,0.1);
-}
-.duration-label {
-    color:#67e8f9; font-size:0.7rem; font-weight:500;
-    display:flex; align-items:center; gap:6px;
-    margin-bottom:0.3rem;
-}
-
 .record-box {
     background: rgba(244,63,94,0.05);
     border:1px solid rgba(244,63,94,0.12);
@@ -217,10 +195,6 @@ st.markdown("""
     border-color:rgba(251,191,36,0.25);
     background: rgba(251,191,36,0.08);
 }
-
-[data-testid="stSlider"] { padding:0.3rem 0; }
-[data-testid="stSlider"] .stSliderLabel { color:#94a3b8 !important; font-size:0.7rem !important; }
-[data-testid="stSlider"] .stSliderValue { color:#67e8f9 !important; font-weight:600 !important; }
 
 [data-testid="stFileUploader"] {
     background:rgba(139,92,246,0.04) !important;
@@ -421,7 +395,6 @@ if "last_processed_audio"  not in st.session_state: st.session_state.last_proces
 if "last_processed_file"   not in st.session_state: st.session_state.last_processed_file   = None
 if "show_translate"        not in st.session_state: st.session_state.show_translate        = False
 if "input_mode"            not in st.session_state: st.session_state.input_mode            = "record"
-if "duration_minutes"      not in st.session_state: st.session_state.duration_minutes      = 0
 if "file_uploaded"         not in st.session_state: st.session_state.file_uploaded         = False
 
 # ─── HELPERS ────────────────────────────────────────────────
@@ -451,26 +424,17 @@ def add_to_history(text, full_text, mode):
     st.session_state.history.insert(0, entry)
     save_history(st.session_state.history)
 
-def do_transcribe(file_path, conversation_mode, mode_label, duration_minutes=0):
+def do_transcribe(file_path, conversation_mode, mode_label):
     config = aai.TranscriptionConfig(speaker_labels=True, speakers_expected=2)
     transcriber = aai.Transcriber(config=config)
-    
-    if duration_minutes > 0:
-        transcript = transcriber.transcribe(
-            file_path,
-            audio_start_from=0,
-            audio_end_at=duration_minutes * 60
-        )
-    else:
-        transcript = transcriber.transcribe(file_path)
+    transcript = transcriber.transcribe(file_path)
     
     if transcript.text:
         formatted = format_transcript(transcript, conversation_mode)
         st.session_state.transcribed_text = formatted
         st.session_state.original_text    = transcript.text
         st.session_state.translated_text  = ""
-        mode_text = f"{mode_label} ({duration_minutes}m)" if duration_minutes > 0 else mode_label
-        add_to_history(formatted, formatted, mode_text)
+        add_to_history(formatted, formatted, mode_label)
         return True
     return False
 
@@ -553,16 +517,6 @@ if st.session_state.input_mode == "record":
     audio_value = st.audio_input("rec", key="audio_recorder", label_visibility="collapsed")
     st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="duration-box">', unsafe_allow_html=True)
-    st.markdown('<div class="duration-label">⏱️ Duration</div>', unsafe_allow_html=True)
-    duration_minutes = st.slider(
-        "Select duration (0 = full file)",
-        min_value=0, max_value=30, value=0, step=1,
-        label_visibility="collapsed"
-    )
-    st.caption(f"{'Full file' if duration_minutes == 0 else f'First {duration_minutes} minute(s)'}")
-    st.markdown('</div>', unsafe_allow_html=True)
-
     audio_hash = hashlib.md5(audio_value.getvalue()).hexdigest() if audio_value else None
     if audio_value and audio_hash != st.session_state.last_processed_audio:
         st.session_state.last_processed_audio = audio_hash
@@ -570,7 +524,7 @@ if st.session_state.input_mode == "record":
             try:
                 tmp = "temp_audio.wav"
                 with open(tmp,"wb") as f: f.write(audio_value.getvalue())
-                ok = do_transcribe(tmp, True, "Conversation", duration_minutes)
+                ok = do_transcribe(tmp, True, "Conversation")
                 if ok:
                     st.markdown('<div class="tr-ok">✓ &nbsp;Transcription complete!</div>', unsafe_allow_html=True)
                     st.markdown('<script>document.getElementById("waveStatus").innerHTML = "✅ Transcription complete!"</script>', unsafe_allow_html=True)
@@ -614,17 +568,6 @@ elif st.session_state.input_mode == "upload":
             st.audio(uploaded_file, format="audio/wav")
         st.caption(f"📄 {uploaded_file.name}  ·  {len(uploaded_file.getvalue())/(1024*1024):.2f} MB")
         
-        st.markdown('<div class="duration-box">', unsafe_allow_html=True)
-        st.markdown('<div class="duration-label">⏱️ Duration</div>', unsafe_allow_html=True)
-        duration_minutes = st.slider(
-            "Select duration (0 = full file)",
-            min_value=0, max_value=30, value=0, step=1,
-            key="duration_slider_upload",
-            label_visibility="collapsed"
-        )
-        st.caption(f"{'Full file' if duration_minutes == 0 else f'First {duration_minutes} minute(s)'}")
-        st.markdown('</div>', unsafe_allow_html=True)
-        
         conversation_mode = st.checkbox("Speaker labels (Conversation Mode)", value=True)
 
         if st.button("Transcribe", type="primary", use_container_width=True):
@@ -636,7 +579,7 @@ elif st.session_state.input_mode == "upload":
                         tmp = f"temp_upload.{ext}"
                         with open(tmp,"wb") as f: f.write(uploaded_file.getbuffer())
                         mode = "Conversation" if conversation_mode else "Standard"
-                        ok = do_transcribe(tmp, conversation_mode, mode, duration_minutes)
+                        ok = do_transcribe(tmp, conversation_mode, mode)
                         if ok:
                             st.markdown('<div class="tr-ok">✓ &nbsp;Transcription complete!</div>', unsafe_allow_html=True)
                         else:
@@ -650,7 +593,7 @@ elif st.session_state.input_mode == "upload":
                 st.markdown('<div class="tr-warn">⚠ Already transcribed.</div>', unsafe_allow_html=True)
     else:
         st.session_state.file_uploaded = False
-        st.info("📂 Upload a file to see duration options")
+        st.info("📂 Upload a file to transcribe")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -675,20 +618,6 @@ else:
     url_input = st.text_input("File URL", placeholder="https://drive.google.com/file/d/.../view or https://example.com/file.mp3", label_visibility="collapsed")
     st.markdown('</div>', unsafe_allow_html=True)
     
-    if url_input:
-        st.markdown('<div class="duration-box">', unsafe_allow_html=True)
-        st.markdown('<div class="duration-label">⏱️ Duration</div>', unsafe_allow_html=True)
-        duration_minutes = st.slider(
-            "Select duration (0 = full file)",
-            min_value=0, max_value=30, value=0, step=1,
-            key="duration_slider_url",
-            label_visibility="collapsed"
-        )
-        st.caption(f"{'Full file' if duration_minutes == 0 else f'First {duration_minutes} minute(s)'}")
-        st.markdown('</div>', unsafe_allow_html=True)
-    else:
-        duration_minutes = 0
-    
     conversation_mode = st.checkbox("Speaker labels (Conversation Mode)", value=True)
 
     if st.button("Transcribe from URL", type="primary", use_container_width=True) and url_input:
@@ -704,15 +633,7 @@ else:
 
                 config = aai.TranscriptionConfig(speaker_labels=True, speakers_expected=2)
                 transcriber = aai.Transcriber(config=config)
-                
-                if duration_minutes > 0:
-                    transcript = transcriber.transcribe(
-                        file_path,
-                        audio_start_from=0,
-                        audio_end_at=duration_minutes * 60
-                    )
-                else:
-                    transcript = transcriber.transcribe(file_path)
+                transcript = transcriber.transcribe(file_path)
 
                 if transcript.text:
                     formatted = format_transcript(transcript, conversation_mode)
@@ -720,8 +641,7 @@ else:
                     st.session_state.original_text = transcript.text
                     st.session_state.translated_text = ""
                     mode = "Conversation" if conversation_mode else "Standard"
-                    mode_text = f"{mode} ({duration_minutes}m)" if duration_minutes > 0 else mode
-                    add_to_history(formatted, formatted, mode_text)
+                    add_to_history(formatted, formatted, mode)
                     st.markdown('<div class="tr-ok">✓ &nbsp;Transcription complete!</div>', unsafe_allow_html=True)
                 else:
                     st.markdown('<div class="tr-err">⚠ No speech detected.</div>', unsafe_allow_html=True)
