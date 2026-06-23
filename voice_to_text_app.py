@@ -111,7 +111,6 @@ st.markdown("""
     font-size:0.68rem; font-weight:500; color:#94a3b8;
 }
 
-/* ─── CENTER WAVE ──────────────────────────────────────── */
 .wave-container {
     display:flex; justify-content:center; align-items:center;
     gap:4px; height:60px; margin:1.5rem auto;
@@ -142,7 +141,6 @@ st.markdown("""
 }
 .wave-status.active { color:#a78bfa; font-weight:600; }
 
-/* ─── TRANSPARENT COLORFUL INPUT PANELS ────────────────── */
 .input-panel {
     background: rgba(139,92,246,0.04);
     backdrop-filter:blur(8px);
@@ -164,10 +162,8 @@ st.markdown("""
     margin-bottom:1.1rem;
     display:flex; align-items:center; gap:8px;
 }
-
 .panel-title svg { flex-shrink:0; }
 
-/* ─── COLORFUL DURATION BOX ────────────────────────────── */
 .duration-box {
     background: rgba(6,182,212,0.06);
     border:1px solid rgba(6,182,212,0.15);
@@ -185,51 +181,43 @@ st.markdown("""
     margin-bottom:0.3rem;
 }
 
-/* ─── COLORFUL RECORD BOX ──────────────────────────────── */
 .record-box {
     background: rgba(244,63,94,0.05);
     border:1px solid rgba(244,63,94,0.12);
     border-radius:12px;
     padding:0.5rem;
-    display: none;
 }
 .record-box:hover {
     border-color:rgba(244,63,94,0.25);
     background: rgba(244,63,94,0.08);
 }
 
-/* ─── COLORFUL UPLOAD BOX ──────────────────────────────── */
 .upload-box {
     background: rgba(52,211,153,0.05);
     border:1px solid rgba(52,211,153,0.12);
     border-radius:12px;
     padding:0.5rem;
-    display: none;
 }
 .upload-box:hover {
     border-color:rgba(52,211,153,0.25);
     background: rgba(52,211,153,0.08);
 }
 
-/* ─── COLORFUL URL BOX ──────────────────────────────────── */
 .url-box {
     background: rgba(251,191,36,0.05);
     border:1px solid rgba(251,191,36,0.12);
     border-radius:12px;
     padding:0.5rem;
-    display: none;            
 }
 .url-box:hover {
     border-color:rgba(251,191,36,0.25);
     background: rgba(251,191,36,0.08);
 }
 
-/* ─── SLIDER ────────────────────────────────────────────── */
 [data-testid="stSlider"] { padding:0.3rem 0; }
 [data-testid="stSlider"] .stSliderLabel { color:#94a3b8 !important; font-size:0.7rem !important; }
 [data-testid="stSlider"] .stSliderValue { color:#67e8f9 !important; font-weight:600 !important; }
 
-/* ─── FILE UPLOADER ─────────────────────────────────────── */
 [data-testid="stFileUploader"] {
     background:rgba(139,92,246,0.04) !important;
     border:1.5px dashed rgba(139,92,246,0.2) !important;
@@ -242,13 +230,11 @@ st.markdown("""
 }
 [data-testid="stFileUploader"] span { color:#94a3b8 !important; }
 
-/* ─── VIDEO/AUDIO ───────────────────────────────────────── */
 [data-testid="stVideo"],[data-testid="stAudio"] {
     width:100% !important; border-radius:12px !important;
     overflow:hidden !important; margin-bottom:0.5rem !important;
 }
 
-/* ─── TRANSCRIPTION BOX ─────────────────────────────────── */
 .tr-box {
     background:rgba(255,255,255,0.02);
     border:1px solid rgba(255,255,255,0.06);
@@ -262,7 +248,6 @@ st.markdown("""
 }
 .tr-box-gold { border-color:rgba(251,191,36,0.15) !important; }
 
-/* ─── ACTION ROW ────────────────────────────────────────── */
 .action-row {
     display:grid; grid-template-columns:1fr 1fr 1fr;
     gap:10px; margin-top:12px;
@@ -278,7 +263,6 @@ st.markdown("""
     font-weight:600 !important;
 }
 
-/* ─── SECTION LABEL ──────────────────────────────────────── */
 .tr-section {
     display:flex; align-items:center; gap:9px;
     color:#64748b; font-size:0.64rem; font-weight:700;
@@ -290,7 +274,6 @@ st.markdown("""
     background:rgba(255,255,255,0.05);
 }
 
-/* ─── HISTORY ────────────────────────────────────────────── */
 .hist-card {
     display:flex; align-items:stretch;
     background:rgba(255,255,255,0.02);
@@ -339,7 +322,6 @@ st.markdown("""
     background:rgba(139,92,246,0.14) !important;
 }
 
-/* ─── BUTTONS ────────────────────────────────────────────── */
 .stButton > button {
     background:linear-gradient(135deg,#7c3aed,#4f46e5) !important;
     color:#fff !important; border:none !important;
@@ -467,13 +449,17 @@ def add_to_history(text, full_text, mode):
 
 def do_transcribe(file_path, conversation_mode, mode_label, duration_minutes=0):
     config = aai.TranscriptionConfig(speaker_labels=True, speakers_expected=2)
+    transcriber = aai.Transcriber(config=config)
     
     if duration_minutes > 0:
-        config.audio_start_from = 0
-        config.audio_end_at = duration_minutes * 60
+        transcript = transcriber.transcribe(
+            file_path,
+            audio_start_from=0,
+            audio_end_at=duration_minutes * 60
+        )
+    else:
+        transcript = transcriber.transcribe(file_path)
     
-    transcriber = aai.Transcriber(config=config)
-    transcript = transcriber.transcribe(file_path)
     if transcript.text:
         formatted = format_transcript(transcript, conversation_mode)
         st.session_state.transcribed_text = formatted
@@ -503,7 +489,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ─── WAVE ANIMATION (CENTERED) ──────────────────────────────
+# ─── WAVE ANIMATION ──────────────────────────────────────────
 st.markdown("""
 <div style="display:flex; flex-direction:column; align-items:center;">
     <div class="wave-container" id="waveContainer">
@@ -563,7 +549,6 @@ if st.session_state.input_mode == "record":
     audio_value = st.audio_input("rec", key="audio_recorder", label_visibility="collapsed")
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Duration slider appears when recording
     st.markdown('<div class="duration-box">', unsafe_allow_html=True)
     st.markdown('<div class="duration-label">⏱️ Duration</div>', unsafe_allow_html=True)
     duration_minutes = st.slider(
@@ -625,7 +610,6 @@ elif st.session_state.input_mode == "upload":
             st.audio(uploaded_file, format="audio/wav")
         st.caption(f"📄 {uploaded_file.name}  ·  {len(uploaded_file.getvalue())/(1024*1024):.2f} MB")
         
-        # ─── DURATION SLIDER (Only shows after file upload) ───
         st.markdown('<div class="duration-box">', unsafe_allow_html=True)
         st.markdown('<div class="duration-label">⏱️ Duration</div>', unsafe_allow_html=True)
         duration_minutes = st.slider(
@@ -687,7 +671,6 @@ else:
     url_input = st.text_input("File URL", placeholder="https://drive.google.com/file/d/.../view or https://example.com/file.mp3", label_visibility="collapsed")
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Duration slider for URL (shown when URL is entered)
     if url_input:
         st.markdown('<div class="duration-box">', unsafe_allow_html=True)
         st.markdown('<div class="duration-label">⏱️ Duration</div>', unsafe_allow_html=True)
@@ -716,11 +699,16 @@ else:
                     file_path = url_input
 
                 config = aai.TranscriptionConfig(speaker_labels=True, speakers_expected=2)
-                if duration_minutes > 0:
-                    config.audio_start_from = 0
-                    config.audio_end_at = duration_minutes * 60
                 transcriber = aai.Transcriber(config=config)
-                transcript = transcriber.transcribe(file_path)
+                
+                if duration_minutes > 0:
+                    transcript = transcriber.transcribe(
+                        file_path,
+                        audio_start_from=0,
+                        audio_end_at=duration_minutes * 60
+                    )
+                else:
+                    transcript = transcriber.transcribe(file_path)
 
                 if transcript.text:
                     formatted = format_transcript(transcript, conversation_mode)
