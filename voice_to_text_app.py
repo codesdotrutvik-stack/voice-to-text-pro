@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 import requests
 import json
+import hashlib
 
 st.set_page_config(page_title="Voice to Text Pro", page_icon="📝", layout="wide")
 
@@ -171,6 +172,10 @@ if "translated_text" not in st.session_state:
     st.session_state.translated_text = ""
 if "copy_msg" not in st.session_state:
     st.session_state.copy_msg = ""
+if "last_processed_audio" not in st.session_state:
+    st.session_state.last_processed_audio = None
+if "last_processed_file" not in st.session_state:
+    st.session_state.last_processed_file = None
 
 # ============================================================
 # FUNCTIONS
@@ -240,7 +245,13 @@ with st.container():
     
     audio_value = st.audio_input("Click to record", key="audio_recorder")
     
+    # Compute a unique hash for the audio data to avoid re-processing
+    audio_hash = None
     if audio_value is not None:
+        audio_hash = hashlib.md5(audio_value.getvalue()).hexdigest()
+    
+    if audio_value is not None and audio_hash != st.session_state.last_processed_audio:
+        st.session_state.last_processed_audio = audio_hash
         with st.spinner("⏳ Transcribing..."):
             try:
                 temp_file = "temp_audio.wav"
@@ -259,6 +270,7 @@ with st.container():
                     st.session_state.transcribed_text = formatted
                     st.session_state.original_text = transcript.text
                     
+                    # Append only once
                     st.session_state.history.append({
                         "text": formatted[:500] + ("..." if len(formatted) > 500 else ""),
                         "full_text": formatted,
@@ -295,6 +307,9 @@ with st.container():
     )
 
     if uploaded_file is not None:
+        # Hash the file to avoid reprocessing same file
+        file_hash = hashlib.md5(uploaded_file.getvalue()).hexdigest()
+        
         file_type = uploaded_file.type
         if "video" in file_type or uploaded_file.name.lower().endswith((".mp4", ".mov", ".avi", ".mkv")):
             st.video(uploaded_file)
@@ -307,46 +322,50 @@ with st.container():
         conversation_mode = st.checkbox("💬 Conversation Mode (Speaker Labels)", value=True)
 
         if st.button("🎯 Transcribe", type="primary", use_container_width=True):
-            with st.spinner("⏳ Transcribing..."):
-                try:
-                    file_ext = uploaded_file.name.split('.')[-1]
-                    temp_file = f"temp_upload.{file_ext}"
-                    with open(temp_file, "wb") as f:
-                        f.write(uploaded_file.getbuffer())
-                    
-                    config_params = {
-                        "speaker_labels": True,
-                        "speakers_expected": 2
-                    }
-                    
-                    config = aai.TranscriptionConfig(**config_params)
-                    transcriber = aai.Transcriber(config=config)
-                    transcript = transcriber.transcribe(temp_file)
-                    
-                    if transcript.text:
-                        formatted = format_transcript(transcript, conversation_mode)
-                        st.session_state.transcribed_text = formatted
-                        st.session_state.original_text = transcript.text
-                        
-                        st.session_state.translated_text = ""
-                        st.session_state.history.append({
-                            "text": formatted[:500] + ("..." if len(formatted) > 500 else ""),
-                            "full_text": formatted,
-                            "time": datetime.now().strftime("%I:%M %p, %d %b"),
-                            "mode": "Conversation" if conversation_mode else "Standard"
-                        })
-                        st.success("✅ Transcription complete!")
-                    else:
-                        st.error("❌ No text detected. Please try again.")
-                        
-                except Exception as e:
-                    st.error(f"❌ Error: {str(e)}")
-                finally:
+            if file_hash != st.session_state.last_processed_file:
+                st.session_state.last_processed_file = file_hash
+                with st.spinner("⏳ Transcribing..."):
                     try:
-                        if os.path.exists(temp_file):
-                            os.remove(temp_file)
-                    except:
-                        pass
+                        file_ext = uploaded_file.name.split('.')[-1]
+                        temp_file = f"temp_upload.{file_ext}"
+                        with open(temp_file, "wb") as f:
+                            f.write(uploaded_file.getbuffer())
+                        
+                        config_params = {
+                            "speaker_labels": True,
+                            "speakers_expected": 2
+                        }
+                        
+                        config = aai.TranscriptionConfig(**config_params)
+                        transcriber = aai.Transcriber(config=config)
+                        transcript = transcriber.transcribe(temp_file)
+                        
+                        if transcript.text:
+                            formatted = format_transcript(transcript, conversation_mode)
+                            st.session_state.transcribed_text = formatted
+                            st.session_state.original_text = transcript.text
+                            
+                            st.session_state.translated_text = ""
+                            st.session_state.history.append({
+                                "text": formatted[:500] + ("..." if len(formatted) > 500 else ""),
+                                "full_text": formatted,
+                                "time": datetime.now().strftime("%I:%M %p, %d %b"),
+                                "mode": "Conversation" if conversation_mode else "Standard"
+                            })
+                            st.success("✅ Transcription complete!")
+                        else:
+                            st.error("❌ No text detected. Please try again.")
+                            
+                    except Exception as e:
+                        st.error(f"❌ Error: {str(e)}")
+                    finally:
+                        try:
+                            if os.path.exists(temp_file):
+                                os.remove(temp_file)
+                        except:
+                            pass
+            else:
+                st.warning("This file has already been transcribed.")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
