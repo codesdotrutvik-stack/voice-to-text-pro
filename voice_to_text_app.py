@@ -351,19 +351,37 @@ with st.container():
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ============================================================
-# DISPLAY TRANSCRIPTION
+# DISPLAY TRANSCRIPTION WITH COPY BUTTON
 # ============================================================
 if st.session_state.transcribed_text:
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     st.markdown('<div class="section-title">📝 Transcription</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="text-box">{st.session_state.transcribed_text}</div>', unsafe_allow_html=True)
     
-    col1, col2, col3, col4 = st.columns(4)
+    # Display text in a div with an id for copying
+    st.markdown(f"""
+    <div id="transcription_text" class="text-box">
+        {st.session_state.transcribed_text}
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Copy button using JavaScript
+    st.markdown("""
+    <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+        <button onclick="
+            var text = document.getElementById('transcription_text').innerText;
+            navigator.clipboard.writeText(text).then(function() {
+                document.getElementById('copy_status').innerHTML = '✅ Copied!';
+                setTimeout(function() {
+                    document.getElementById('copy_status').innerHTML = '';
+                }, 3000);
+            });
+        " style="background: #7c3aed; color: white; border: none; border-radius: 8px; padding: 8px 18px; cursor: pointer; font-weight: 500;">📋 Copy</button>
+        <span id="copy_status" style="color: #10b981; font-weight: 500;"></span>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns(3)
     with col1:
-        if st.button("📋 Copy", key="copy_transcription", use_container_width=True):
-            st.session_state.copy_msg = "✅ Copied to clipboard!"
-            st.rerun()
-    with col2:
         if st.button("📥 Download", key="download_transcription", use_container_width=True):
             st.download_button(
                 label="📥 Download",
@@ -372,13 +390,13 @@ if st.session_state.transcribed_text:
                 mime="text/plain",
                 key="download_btn_main"
             )
-    with col3:
+    with col2:
         if st.button("🗑️ Clear", key="clear_transcription", use_container_width=True):
             st.session_state.transcribed_text = ""
             st.session_state.original_text = ""
             st.session_state.translated_text = ""
             st.rerun()
-    with col4:
+    with col3:
         if st.button("🔁 Translate", key="translate_btn", use_container_width=True):
             st.session_state.show_translate = not st.session_state.get("show_translate", False)
             st.rerun()
@@ -421,7 +439,7 @@ if st.session_state.get("show_translate", False) and st.session_state.transcribe
                     )
 
 # ============================================================
-# HISTORY - CLEAN VERSION (NO EXTRA DIVS)
+# HISTORY
 # ============================================================
 if st.session_state.history:
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
