@@ -6,19 +6,12 @@ import requests
 import json
 import hashlib
 
-st.set_page_config(page_title="Voice to Text Pro", page_icon="✨", layout="wide")
+st.set_page_config(page_title="Transcriptr", page_icon="🎙️", layout="wide")
 
-# ============================================================
-# API KEYS
-# ============================================================
 ASSEMBLYAI_KEY = "5e874d691c74442f8b602827e6d26752"
 MISTRAL_KEY = "tXPmUYPeEqwD48MrvREFmn3GmvB7KqRk"
-
 aai.settings.api_key = ASSEMBLYAI_KEY
 
-# ============================================================
-# HISTORY FILE
-# ============================================================
 HISTORY_FILE = "history.json"
 
 def load_history():
@@ -37,710 +30,623 @@ def save_history(history):
     except:
         pass
 
-# ============================================================
-# PREMIUM CSS — Next-Level Design
-# ============================================================
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Syne:wght@700;800&display=swap');
 
-*, *::before, *::after {
-    margin: 0; padding: 0; box-sizing: border-box;
-    font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
-}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
 
-/* ── App Background ── */
-.stApp {
-    background: #09090b;
-    min-height: 100vh;
-}
+.stApp { background:#07070e; min-height:100vh; }
 
 .block-container {
-    padding: 2.5rem 2rem !important;
-    max-width: 860px !important;
-    margin: 0 auto;
+    padding: 2.5rem 2rem 5rem 2rem !important;
+    max-width: 820px !important;
+    position: relative;
+    z-index: 1;
 }
 
-/* ── Animations ── */
 @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from { opacity:0; transform:translateY(14px); }
+    to   { opacity:1; transform:translateY(0); }
 }
 @keyframes shimmer {
-    0%   { background-position: -200% center; }
-    100% { background-position:  200% center; }
+    0%   { background-position:-200% center; }
+    100% { background-position:200% center; }
 }
-@keyframes pulse-ring {
-    0%   { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
-    70%  { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
-}
-@keyframes glow-line {
-    0%, 100% { opacity: 0.4; }
-    50%       { opacity: 1; }
+@keyframes pulse {
+    0%,100% { opacity:1; }
+    50%      { opacity:0.4; }
 }
 
-/* ── Header ── */
-.vtp-header {
-    text-align: center;
-    padding: 3rem 0 2rem;
-    animation: fadeUp 0.6s ease;
+/* ─── HEADER ────────────────────────────────────── */
+.tr-header { text-align:center; padding:2.8rem 0 2.2rem; animation:fadeUp 0.7s ease both; }
+.tr-badge {
+    display:inline-flex; align-items:center; gap:7px;
+    background:rgba(139,92,246,0.1);
+    border:1px solid rgba(139,92,246,0.22);
+    border-radius:100px;
+    padding:5px 16px;
+    font-size:0.65rem; font-weight:700;
+    color:#a78bfa; letter-spacing:2.5px; text-transform:uppercase;
+    margin-bottom:1.4rem;
 }
-.vtp-logo-ring {
-    width: 56px; height: 56px;
-    background: linear-gradient(135deg, #7c3aed, #4f46e5);
-    border-radius: 16px;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 1.2rem;
-    box-shadow: 0 0 32px rgba(124, 58, 237, 0.35);
-    font-size: 1.5rem;
+.tr-badge .live-dot {
+    width:6px; height:6px; border-radius:50%;
+    background:#8b5cf6; box-shadow:0 0 8px #8b5cf6;
+    animation:pulse 2s infinite;
 }
-.vtp-title {
-    font-size: 2.4rem;
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    color: #fafafa;
-    line-height: 1;
-    margin-bottom: 0.5rem;
+.tr-logo {
+    font-family:'Syne',sans-serif;
+    font-size:3.4rem; font-weight:800;
+    letter-spacing:-0.05em; line-height:1;
+    margin-bottom:0.5rem;
 }
-.vtp-title .accent {
-    background: linear-gradient(120deg, #a78bfa, #818cf8, #6366f1);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shimmer 3s linear infinite;
+.tr-logo .w { color:#e2e8f0; }
+.tr-logo .acc {
+    background:linear-gradient(135deg,#8b5cf6 0%,#6366f1 55%,#38bdf8 100%);
+    background-size:200% auto;
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    animation:shimmer 5s linear infinite;
 }
-.vtp-subtitle {
-    color: #52525b;
-    font-size: 0.85rem;
-    font-weight: 400;
-    letter-spacing: 0.02em;
+.tr-tagline { color:#1e293b; font-size:0.8rem; letter-spacing:0.04em; }
+.tr-pills {
+    display:flex; justify-content:center; gap:8px; flex-wrap:wrap;
+    margin-top:1.2rem;
 }
-.vtp-subtitle span {
-    color: #71717a;
-    margin: 0 6px;
-}
-
-/* ── Card ── */
-.card {
-    background: #111113;
-    border: 1px solid #1f1f23;
-    border-radius: 16px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    animation: fadeUp 0.5s ease;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-.card:hover {
-    border-color: #2d2d33;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-}
-.card-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 1rem;
-}
-.card-icon {
-    width: 32px; height: 32px;
-    background: rgba(124, 58, 237, 0.12);
-    border: 1px solid rgba(124, 58, 237, 0.2);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.85rem;
-    flex-shrink: 0;
-}
-.card-label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #a1a1aa;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-}
-.card-caption {
-    font-size: 0.72rem;
-    color: #3f3f46;
-    margin-top: 2px;
-    letter-spacing: 0.01em;
+.tr-pill {
+    display:inline-flex; align-items:center; gap:5px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:100px; padding:4px 12px;
+    font-size:0.68rem; font-weight:500; color:#334155;
 }
 
-/* ── Upload Zone ── */
+/* ─── TAB SWITCHER ──────────────────────────────── */
+.tab-bar {
+    display:flex; gap:4px;
+    background:rgba(255,255,255,0.025);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:14px; padding:5px; margin-bottom:1.4rem;
+}
+.tab-btn {
+    flex:1; text-align:center;
+    padding:10px 0; border-radius:10px;
+    font-size:0.78rem; font-weight:600;
+    cursor:pointer; transition:all 0.2s;
+    color:#334155; border:none; background:transparent;
+}
+.tab-btn.active {
+    background:linear-gradient(135deg,#7c3aed,#6366f1);
+    color:#fff;
+    box-shadow:0 2px 12px rgba(124,58,237,0.3);
+}
+
+/* ─── INPUT PANEL ───────────────────────────────── */
+.input-panel {
+    background:rgba(255,255,255,0.022);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:18px; padding:1.8rem 1.8rem 1.4rem;
+    margin-bottom:1.2rem; animation:fadeUp 0.5s ease both;
+    transition:border-color 0.25s;
+}
+.input-panel:hover { border-color:rgba(139,92,246,0.18); }
+.panel-title {
+    font-size:0.68rem; font-weight:700; color:#2d3748;
+    text-transform:uppercase; letter-spacing:2px;
+    margin-bottom:1.1rem;
+    display:flex; align-items:center; gap:8px;
+}
+.panel-title svg { flex-shrink:0; }
+
+/* ─── RECORD ZONE ───────────────────────────────── */
+.rec-hint {
+    color:#1e293b; font-size:0.75rem; text-align:center;
+    padding:0.4rem 0 0.8rem; letter-spacing:0.02em;
+}
+
+/* ─── FILE UPLOADER ─────────────────────────────── */
 [data-testid="stFileUploader"] {
-    width: 100% !important;
+    background:rgba(255,255,255,0.015) !important;
+    border:1.5px dashed rgba(139,92,246,0.18) !important;
+    border-radius:12px !important;
+    transition:border-color 0.2s !important;
 }
-[data-testid="stFileUploader"] > div {
-    background: rgba(124, 58, 237, 0.03) !important;
-    border: 1.5px dashed #27272a !important;
-    border-radius: 12px !important;
-    padding: 1.8rem 1.5rem !important;
-    transition: all 0.2s ease !important;
+[data-testid="stFileUploader"]:hover {
+    border-color:rgba(139,92,246,0.42) !important;
+    background:rgba(139,92,246,0.03) !important;
 }
-[data-testid="stFileUploader"] > div:hover {
-    border-color: rgba(124, 58, 237, 0.4) !important;
-    background: rgba(124, 58, 237, 0.05) !important;
-}
-[data-testid="stFileUploader"] label { color: #52525b !important; font-size: 0.82rem !important; }
+[data-testid="stFileUploader"] span { color:#334155 !important; }
 
-/* ── Audio / Video ── */
-[data-testid="stAudio"], [data-testid="stVideo"] {
-    width: 100% !important;
-    border-radius: 10px;
-    overflow: hidden;
-}
-[data-testid="stAudio"] audio {
-    filter: invert(1) hue-rotate(180deg) !important;
+/* ─── VIDEO/AUDIO ───────────────────────────────── */
+[data-testid="stVideo"],[data-testid="stAudio"] {
+    width:100% !important; border-radius:12px !important;
+    overflow:hidden !important; margin-bottom:0.5rem !important;
 }
 
-/* ── Transcription Box ── */
-.text-box {
-    background: #0d0d10;
-    border: 1px solid #1f1f23;
-    border-radius: 12px;
-    padding: 20px;
-    min-height: 140px;
-    color: #d4d4d8;
-    font-size: 0.9rem;
-    line-height: 1.9;
-    white-space: pre-wrap;
-    max-height: 520px;
-    overflow-y: auto;
-    animation: fadeUp 0.4s ease;
-    font-family: 'Geist', sans-serif;
+/* ─── TRANSCRIPTION BOX ─────────────────────────── */
+.tr-box {
+    background:rgba(255,255,255,0.022);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:14px;
+    padding:20px 22px;
+    min-height:150px; max-height:480px;
+    color:#94a3b8; font-size:0.88rem; line-height:1.85;
+    white-space:pre-wrap; overflow-y:auto;
+    animation:fadeUp 0.5s ease both;
+    margin-bottom:0;
 }
-.text-box::-webkit-scrollbar { width: 4px; }
-.text-box::-webkit-scrollbar-track { background: transparent; }
-.text-box::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
+.tr-box-gold { border-color:rgba(251,191,36,0.18) !important; }
 
-/* ── History Item ── */
-.history-item {
-    background: #111113;
-    border: 1px solid #1f1f23;
-    border-radius: 12px;
-    padding: 14px 16px;
-    margin: 6px 0;
-    transition: all 0.18s ease;
-    animation: fadeUp 0.4s ease;
-    position: relative;
+/* ─── ACTION ROW (3 buttons under transcription) ── */
+.action-row {
+    display:grid; grid-template-columns:1fr 1fr 1fr;
+    gap:10px; margin-top:12px;
 }
-.history-item:hover {
-    border-color: rgba(124, 58, 237, 0.3);
-    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.06);
+/* Force equal height on Streamlit button wrappers */
+.action-row .stButton, .action-row [data-testid="stDownloadButton"] {
+    height:40px !important;
 }
-.history-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 12px;
-}
-.history-meta { flex: 1; min-width: 0; }
-.history-mode {
-    color: #a78bfa;
-    font-weight: 600;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 4px;
-}
-.history-time {
-    color: #3f3f46;
-    font-size: 0.68rem;
-    margin-bottom: 6px;
-    font-family: 'Geist Mono', monospace;
-}
-.history-text {
-    color: #71717a;
-    font-size: 0.82rem;
-    line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+.action-row .stButton > button,
+.action-row [data-testid="stDownloadButton"] > button {
+    height:40px !important; width:100% !important;
+    padding:0 !important; font-size:0.78rem !important;
+    font-weight:600 !important;
 }
 
-/* ── Buttons — global Streamlit override ── */
+/* ─── SECTION LABEL ─────────────────────────────── */
+.tr-section {
+    display:flex; align-items:center; gap:9px;
+    color:#1e293b; font-size:0.64rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:2.5px;
+    margin:2rem 0 1rem;
+}
+.tr-section::after {
+    content:''; flex:1; height:1px;
+    background:rgba(255,255,255,0.05);
+}
+
+/* ─── HISTORY ───────────────────────────────────── */
+.hist-card {
+    display:flex; align-items:stretch;
+    background:rgba(255,255,255,0.028);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:16px; overflow:hidden;
+    margin-bottom:10px;
+    transition:border-color 0.2s, background 0.2s;
+    animation:fadeUp 0.4s ease both;
+}
+.hist-card:hover {
+    border-color:rgba(139,92,246,0.22);
+    background:rgba(139,92,246,0.03);
+}
+.hist-main { flex:1; padding:14px 16px; min-width:0; }
+.hist-top {
+    display:flex; justify-content:space-between;
+    align-items:center; margin-bottom:7px;
+}
+.hist-badge {
+    font-size:0.62rem; font-weight:800;
+    color:#7c3aed; text-transform:uppercase; letter-spacing:1.5px;
+    background:rgba(124,58,237,0.12);
+    border:1px solid rgba(124,58,237,0.2);
+    border-radius:6px; padding:2px 8px;
+}
+.hist-time { color:#334155; font-size:0.65rem; font-weight:500; }
+.hist-preview {
+    color:#64748b; font-size:0.8rem; line-height:1.55;
+    overflow:hidden;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+}
+/* Download side panel */
+.hist-dl-side {
+    width:52px; min-width:52px;
+    background:rgba(139,92,246,0.06);
+    border-left:1px solid rgba(139,92,246,0.1);
+    display:flex; align-items:center; justify-content:center;
+    transition:background 0.2s;
+    cursor:pointer;
+}
+.hist-dl-side:hover { background:rgba(139,92,246,0.14); }
+
+/* Override download button inside hist side */
+.hist-dl-col [data-testid="stDownloadButton"] button {
+    background:rgba(139,92,246,0.07) !important;
+    border:none !important;
+    border-left:1px solid rgba(139,92,246,0.12) !important;
+    border-radius:0 !important;
+    color:#8b5cf6 !important;
+    font-size:1.1rem !important; font-weight:700 !important;
+    height:100% !important; min-height:72px !important;
+    width:100% !important;
+    box-shadow:none !important; padding:0 !important;
+    transition:background 0.2s !important;
+}
+.hist-dl-col [data-testid="stDownloadButton"] button:hover {
+    background:rgba(139,92,246,0.18) !important;
+}
+
+/* ─── BUTTONS ────────────────────────────────────── */
 .stButton > button {
-    background: #18181b !important;
-    color: #a1a1aa !important;
-    border: 1px solid #27272a !important;
-    border-radius: 8px !important;
-    font-weight: 500 !important;
-    font-size: 0.8rem !important;
-    padding: 7px 16px !important;
-    transition: all 0.18s ease !important;
-    box-shadow: none !important;
-    letter-spacing: 0.01em;
+    background:linear-gradient(135deg,#7c3aed,#6366f1) !important;
+    color:#fff !important; border:none !important;
+    border-radius:10px !important; font-weight:600 !important;
+    font-size:0.8rem !important;
+    letter-spacing:0.02em !important;
+    transition:all 0.2s !important;
+    box-shadow:0 2px 12px rgba(124,58,237,0.2) !important;
 }
 .stButton > button:hover {
-    background: #1f1f23 !important;
-    border-color: #3f3f46 !important;
-    color: #e4e4e7 !important;
-    transform: translateY(-1px);
+    background:linear-gradient(135deg,#6d28d9,#4f46e5) !important;
+    transform:translateY(-1px) !important;
+    box-shadow:0 4px 22px rgba(124,58,237,0.36) !important;
+}
+.stButton > button[kind="secondary"] {
+    background:rgba(255,255,255,0.04) !important;
+    color:#475569 !important; box-shadow:none !important;
+    border:1px solid rgba(255,255,255,0.08) !important;
+}
+.stButton > button[kind="secondary"]:hover {
+    background:rgba(255,255,255,0.08) !important;
+    color:#94a3b8 !important; transform:none !important;
+}
+[data-testid="stDownloadButton"] button {
+    background:linear-gradient(135deg,#7c3aed,#6366f1) !important;
+    color:#fff !important; border:none !important;
+    border-radius:10px !important; font-weight:600 !important;
+    font-size:0.8rem !important; box-shadow:0 2px 12px rgba(124,58,237,0.2) !important;
+    transition:all 0.2s !important;
+}
+[data-testid="stDownloadButton"] button:hover {
+    background:linear-gradient(135deg,#6d28d9,#4f46e5) !important;
+    transform:translateY(-1px) !important;
+    box-shadow:0 4px 22px rgba(124,58,237,0.36) !important;
 }
 
-/* Primary button */
-.stButton > button[kind="primary"],
-div[data-testid="column"] .stButton > button[kind="primary"] {
-    background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
-    color: #fff !important;
-    border: none !important;
-    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3) !important;
-}
-.stButton > button[kind="primary"]:hover {
-    background: linear-gradient(135deg, #6d28d9, #5b21b6) !important;
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4) !important;
-    transform: translateY(-1px);
-}
+/* ─── CHECKBOX ───────────────────────────────────── */
+[data-testid="stCheckbox"] label { color:#475569 !important; font-size:0.8rem !important; }
 
-/* ── Section Labels ── */
-.section-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #3f3f46;
-    font-size: 0.68rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin: 1.6rem 0 0.8rem;
-}
-.section-label::before, .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: #1f1f23;
-}
-
-/* ── Status / Alerts ── */
-.stAlert {
-    background: rgba(16, 185, 129, 0.06) !important;
-    border: 1px solid rgba(16, 185, 129, 0.2) !important;
-    border-radius: 10px !important;
-    color: #6ee7b7 !important;
-}
-[data-testid="stNotification"] { border-radius: 10px !important; }
-
-/* ── Checkbox ── */
-[data-testid="stCheckbox"] label {
-    color: #71717a !important;
-    font-size: 0.8rem !important;
-}
-[data-testid="stCheckbox"] span[aria-checked="true"] {
-    background: #7c3aed !important;
-    border-color: #7c3aed !important;
-}
-
-/* ── Select Box ── */
+/* ─── SELECT ─────────────────────────────────────── */
 [data-testid="stSelectbox"] > div > div {
-    background: #111113 !important;
-    border-color: #27272a !important;
-    color: #d4d4d8 !important;
-    border-radius: 8px !important;
+    background:rgba(255,255,255,0.04) !important;
+    border:1px solid rgba(255,255,255,0.09) !important;
+    border-radius:10px !important; color:#cbd5e1 !important;
 }
 
-/* ── Spinner ── */
-[data-testid="stSpinner"] { color: #7c3aed !important; }
+/* ─── CAPTION ────────────────────────────────────── */
+.stCaption p,[data-testid="stCaptionContainer"] p { color:#2d3748 !important; font-size:0.7rem !important; }
 
-/* ── File caption ── */
-.file-meta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 8px;
-    color: #3f3f46;
-    font-size: 0.72rem;
-    font-family: 'Geist Mono', monospace;
+/* ─── STATUS ─────────────────────────────────────── */
+.tr-ok {
+    display:flex; align-items:center; gap:10px;
+    background:rgba(16,185,129,0.07); border:1px solid rgba(16,185,129,0.18);
+    border-radius:10px; padding:10px 14px; color:#34d399;
+    font-size:0.8rem; font-weight:500; margin:0.7rem 0;
+    animation:fadeUp 0.4s ease;
 }
-.file-dot {
-    width: 4px; height: 4px;
-    background: #3f3f46;
-    border-radius: 50%;
+.tr-err {
+    background:rgba(239,68,68,0.07); border:1px solid rgba(239,68,68,0.18);
+    border-radius:10px; padding:10px 14px; color:#f87171;
+    font-size:0.8rem; margin:0.7rem 0;
 }
-
-/* ── Badge ── */
-.badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: rgba(124, 58, 237, 0.1);
-    border: 1px solid rgba(124, 58, 237, 0.2);
-    color: #a78bfa;
-    font-size: 0.65rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    padding: 2px 8px;
-    border-radius: 20px;
+.tr-warn {
+    background:rgba(251,191,36,0.07); border:1px solid rgba(251,191,36,0.18);
+    border-radius:10px; padding:10px 14px; color:#fbbf24;
+    font-size:0.8rem; margin:0.7rem 0;
 }
 
-/* ── Divider ── */
-.vdivider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent 0%, #1f1f23 30%, #1f1f23 70%, transparent 100%);
-    margin: 1.5rem 0;
+/* ─── SCROLLBAR ──────────────────────────────────── */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:#4c1d95; border-radius:10px; }
+
+/* ─── FOOTER ─────────────────────────────────────── */
+.tr-footer {
+    text-align:center; color:#1e293b;
+    font-size:0.6rem; font-weight:500; letter-spacing:1px;
+    padding:1.5rem 0 0.5rem;
 }
+.tr-footer em { color:#6d28d9; font-style:normal; }
 
-/* ── Download icon button in history ── */
-.dl-icon-btn {
-    background: rgba(124, 58, 237, 0.08);
-    border: 1px solid rgba(124, 58, 237, 0.15);
-    border-radius: 8px;
-    width: 34px; height: 34px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    transition: all 0.18s ease;
-    flex-shrink: 0;
-    color: #7c3aed;
-    font-size: 0.85rem;
+/* ─── MISC ───────────────────────────────────────── */
+.tr-hr {
+    height:1px;
+    background:linear-gradient(90deg,transparent,rgba(139,92,246,0.12),transparent);
+    margin:2rem 0 0; border:none;
 }
-.dl-icon-btn:hover {
-    background: rgba(124, 58, 237, 0.16);
-    border-color: rgba(124, 58, 237, 0.35);
-}
-
-/* ── Footer ── */
-.vtp-footer {
-    text-align: center;
-    color: #27272a;
-    font-size: 0.65rem;
-    padding: 2rem 0 1rem;
-    letter-spacing: 0.04em;
-}
-.vtp-footer strong { color: #3f3f46; }
-
-/* ── Audio recorder widget ── */
-[data-testid="stAudioInput"] {
-    background: transparent !important;
-}
-[data-testid="stAudioInput"] > div {
-    background: #0d0d10 !important;
-    border: 1px solid #1f1f23 !important;
-    border-radius: 12px !important;
-}
-
-/* hide top spacer Streamlit adds above file uploader label */
-[data-testid="stFileUploader"] section { display: none !important; }
-[data-testid="stFileUploader"] label { display: none !important; }
-
-/* Collapse empty markdown containers that create blank boxes */
-.stMarkdown:empty { display: none !important; }
-div[data-testid="stVerticalBlock"] > div:empty { display: none !important; }
-
-/* ── Global dark override for any leftover white backgrounds ── */
-.element-container { background: transparent !important; }
-.stTextInput > div, .stSelectbox > div { background: transparent !important; }
-
-/* Remove Streamlit's default top/bottom padding on containers */
-section[data-testid="stSidebar"] { display: none; }
+.spacer-sm { height:0.6rem; }
+#MainMenu,footer,header { visibility:hidden; }
+[data-testid="stDecoration"] { display:none; }
 </style>
 """, unsafe_allow_html=True)
 
-# ============================================================
-# SESSION STATE
-# ============================================================
-if "history" not in st.session_state:
-    st.session_state.history = load_history()
-if "transcribed_text" not in st.session_state:
-    st.session_state.transcribed_text = ""
-if "original_text" not in st.session_state:
-    st.session_state.original_text = ""
-if "translated_text" not in st.session_state:
-    st.session_state.translated_text = ""
-if "copy_msg" not in st.session_state:
-    st.session_state.copy_msg = ""
-if "last_processed_audio" not in st.session_state:
-    st.session_state.last_processed_audio = None
-if "last_processed_file" not in st.session_state:
-    st.session_state.last_processed_file = None
-if "show_translate" not in st.session_state:
-    st.session_state.show_translate = False
+# ─── SESSION STATE ──────────────────────────────────────────
+if "history"               not in st.session_state: st.session_state.history               = load_history()
+if "transcribed_text"      not in st.session_state: st.session_state.transcribed_text      = ""
+if "original_text"         not in st.session_state: st.session_state.original_text         = ""
+if "translated_text"       not in st.session_state: st.session_state.translated_text       = ""
+if "last_processed_audio"  not in st.session_state: st.session_state.last_processed_audio  = None
+if "last_processed_file"   not in st.session_state: st.session_state.last_processed_file   = None
+if "show_translate"        not in st.session_state: st.session_state.show_translate        = False
+if "input_mode"            not in st.session_state: st.session_state.input_mode            = "record"
 
-# ============================================================
-# FUNCTIONS
-# ============================================================
+# ─── HELPERS ────────────────────────────────────────────────
 def translate_text(text, target_lang):
-    lang_map = {
-        "Hindi": "Hindi", "Gujarati": "Gujarati", "Spanish": "Spanish",
-        "French": "French", "German": "German", "Chinese": "Chinese", "Japanese": "Japanese"
-    }
-    language = lang_map.get(target_lang, "Hindi")
+    lang_map = {"Hindi":"Hindi","Gujarati":"Gujarati","Spanish":"Spanish",
+                "French":"French","German":"German","Chinese":"Chinese","Japanese":"Japanese"}
     url = "https://api.mistral.ai/v1/chat/completions"
-    headers = {"Authorization": f"Bearer {MISTRAL_KEY}", "Content-Type": "application/json"}
-    prompt = f"Translate the following text to {language}. Only output the translation, no additional text.\n\nText:\n{text}"
-    data = {"model": "mistral-small-latest", "messages": [{"role": "user", "content": prompt}], "max_tokens": 2000}
+    headers = {"Authorization":f"Bearer {MISTRAL_KEY}","Content-Type":"application/json"}
+    prompt = f"Translate to {lang_map.get(target_lang, 'Hindi')}. Only the translation.\n\n{text}"
+    data = {"model":"mistral-small-latest","messages":[{"role":"user","content":prompt}],"max_tokens":2000}
     try:
-        response = requests.post(url, json=data, headers=headers, timeout=30)
-        return response.json()["choices"][0]["message"]["content"]
+        r = requests.post(url,json=data,headers=headers,timeout=30)
+        return r.json()["choices"][0]["message"]["content"]
     except:
         return "Translation failed."
 
 def format_transcript(transcript, conversation_mode):
     if conversation_mode and transcript.utterances:
-        formatted = ""
-        for utterance in transcript.utterances:
-            speaker = f"Speaker {utterance.speaker}"
-            formatted += f"**{speaker}:** {utterance.text}\n\n"
-        return formatted
+        return "".join(f"**Speaker {u.speaker}:** {u.text}\n\n" for u in transcript.utterances)
     return transcript.text
 
 def add_to_history(text, full_text, mode):
-    entry = {
-        "text": text[:500] + ("..." if len(text) > 500 else ""),
-        "full_text": full_text,
-        "time": datetime.now().strftime("%I:%M %p · %d %b"),
-        "mode": mode
-    }
+    entry = {"text":text[:500]+("..." if len(text)>500 else ""),
+             "full_text":full_text,
+             "time":datetime.now().strftime("%I:%M %p, %d %b"),
+             "mode":mode}
     st.session_state.history.insert(0, entry)
     save_history(st.session_state.history)
 
-# ============================================================
-# HEADER
-# ============================================================
+def do_transcribe(file_path, conversation_mode, mode_label):
+    config = aai.TranscriptionConfig(speaker_labels=True, speakers_expected=2)
+    transcriber = aai.Transcriber(config=config)
+    transcript = transcriber.transcribe(file_path)
+    if transcript.text:
+        formatted = format_transcript(transcript, conversation_mode)
+        st.session_state.transcribed_text = formatted
+        st.session_state.original_text    = transcript.text
+        st.session_state.translated_text  = ""
+        add_to_history(formatted, formatted, mode_label)
+        return True
+    return False
+
+# ─── HEADER ─────────────────────────────────────────────────
 st.markdown("""
-<div class="vtp-header">
-    <div class="vtp-logo-ring">🎙️</div>
-    <div class="vtp-title">Voice to Text <span class="accent">Pro</span></div>
-    <div class="vtp-subtitle">
-        Upload audio or video
-        <span>·</span>
-        Record your voice
-        <span>·</span>
-        AI transcribes &amp; translates
-    </div>
+<div class="tr-header">
+  <div class="tr-badge"><span class="live-dot"></span>AI · Live Transcription</div>
+  <div class="tr-logo">
+    <span class="w">Trans</span><span class="acc">criptr</span>
+  </div>
+  <div class="tr-tagline">Multi-speaker transcription &amp; AI translation, in seconds.</div>
+  <div class="tr-pills">
+    <span class="tr-pill">🎙 Record Live</span>
+    <span class="tr-pill">📁 Upload File</span>
+    <span class="tr-pill">👥 Speaker Labels</span>
+    <span class="tr-pill">🌐 Translate</span>
+    <span class="tr-pill">📜 History</span>
+  </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Status banner
-if st.session_state.copy_msg:
-    st.success(st.session_state.copy_msg)
-    st.session_state.copy_msg = ""
+# ─── TAB SWITCHER ────────────────────────────────────────────
+col_t1, col_t2 = st.columns(2)
+with col_t1:
+    if st.button("🎙  Record Voice", use_container_width=True,
+                 type="primary" if st.session_state.input_mode=="record" else "secondary"):
+        st.session_state.input_mode = "record"
+        st.rerun()
+with col_t2:
+    if st.button("📁  Upload File", use_container_width=True,
+                 type="primary" if st.session_state.input_mode=="upload" else "secondary"):
+        st.session_state.input_mode = "upload"
+        st.rerun()
 
-# ============================================================
-# RECORD SECTION  — no wrapper divs that create extra boxes
-# ============================================================
-st.markdown("""
-<div class="card">
-    <div class="card-header">
-        <div class="card-icon">🎤</div>
-        <div>
-            <div class="card-label">Record Voice</div>
-            <div class="card-caption">Tap the mic and start speaking</div>
-        </div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+# ─── RECORD PANEL ────────────────────────────────────────────
+if st.session_state.input_mode == "record":
+    st.markdown("""
+    <div class="input-panel">
+      <div class="panel-title">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+        </svg>
+        Live Recording
+      </div>
+    """, unsafe_allow_html=True)
 
-audio_value = st.audio_input("", key="audio_recorder", label_visibility="collapsed")
+    st.markdown('<p class="rec-hint">Press the mic icon below to start — auto-transcribes on stop</p>', unsafe_allow_html=True)
+    audio_value = st.audio_input("rec", key="audio_recorder", label_visibility="collapsed")
 
-audio_hash = None
-if audio_value is not None:
-    audio_hash = hashlib.md5(audio_value.getvalue()).hexdigest()
-
-if audio_value is not None and audio_hash != st.session_state.last_processed_audio:
-    st.session_state.last_processed_audio = audio_hash
-    with st.spinner("Transcribing your recording…"):
-        try:
-            temp_file = "temp_audio.wav"
-            with open(temp_file, "wb") as f:
-                f.write(audio_value.getvalue())
-            config = aai.TranscriptionConfig(speaker_labels=True, speakers_expected=2)
-            transcriber = aai.Transcriber(config=config)
-            transcript = transcriber.transcribe(temp_file)
-            if transcript.text:
-                formatted = format_transcript(transcript, True)
-                st.session_state.transcribed_text = formatted
-                st.session_state.original_text = transcript.text
-                add_to_history(formatted, formatted, "Conversation")
-                st.success("Transcription complete")
-            else:
-                st.error("No speech detected — please try again.")
-        except Exception as e:
-            st.error(f"Error: {str(e)}")
-        finally:
+    audio_hash = hashlib.md5(audio_value.getvalue()).hexdigest() if audio_value else None
+    if audio_value and audio_hash != st.session_state.last_processed_audio:
+        st.session_state.last_processed_audio = audio_hash
+        with st.spinner("Transcribing recording…"):
             try:
-                if os.path.exists(temp_file):
-                    os.remove(temp_file)
-            except:
-                pass
+                tmp = "temp_audio.wav"
+                with open(tmp,"wb") as f: f.write(audio_value.getvalue())
+                ok = do_transcribe(tmp, True, "Conversation")
+                if ok:
+                    st.markdown('<div class="tr-ok">✓ &nbsp;Transcription complete!</div>', unsafe_allow_html=True)
+                else:
+                    st.markdown('<div class="tr-err">⚠ No speech detected.</div>', unsafe_allow_html=True)
+            except Exception as e:
+                st.markdown(f'<div class="tr-err">⚠ {e}</div>', unsafe_allow_html=True)
+            finally:
+                try: os.remove("temp_audio.wav")
+                except: pass
 
-# ============================================================
-# UPLOAD SECTION
-# ============================================================
-st.markdown("""
-<div class="card" style="margin-top:1rem;">
-    <div class="card-header">
-        <div class="card-icon">📂</div>
-        <div>
-            <div class="card-label">Upload File</div>
-            <div class="card-caption">MP3 · WAV · M4A · FLAC · WebM · MP4 · MOV · AVI · MKV</div>
-        </div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-uploaded_file = st.file_uploader(
-    "Upload audio or video",
-    type=["mp3", "wav", "m4a", "flac", "webm", "mp4", "mov", "avi", "mkv"],
-    label_visibility="collapsed"
-)
+# ─── UPLOAD PANEL ────────────────────────────────────────────
+else:
+    st.markdown("""
+    <div class="input-panel">
+      <div class="panel-title">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        Upload Audio / Video
+      </div>
+    """, unsafe_allow_html=True)
 
-if uploaded_file is not None:
-    file_hash = hashlib.md5(uploaded_file.getvalue()).hexdigest()
-    file_type = uploaded_file.type
-    if "video" in file_type or uploaded_file.name.lower().endswith((".mp4", ".mov", ".avi", ".mkv")):
-        st.video(uploaded_file)
-    else:
-        st.audio(uploaded_file, format="audio/wav")
+    st.caption("MP3 · WAV · M4A · FLAC · WebM · MP4 · MOV · AVI · MKV")
 
-    file_size = len(uploaded_file.getvalue()) / (1024 * 1024)
-    st.markdown(f"""
-    <div class="file-meta">
-        <span>📄 {uploaded_file.name}</span>
-        <span class="file-dot"></span>
-        <span>{file_size:.1f} MB</span>
+    uploaded_file = st.file_uploader("u", type=["mp3","wav","m4a","flac","webm","mp4","mov","avi","mkv"], label_visibility="collapsed")
+
+    if uploaded_file:
+        file_hash = hashlib.md5(uploaded_file.getvalue()).hexdigest()
+        if "video" in uploaded_file.type or uploaded_file.name.lower().endswith((".mp4",".mov",".avi",".mkv")):
+            st.video(uploaded_file)
+        else:
+            st.audio(uploaded_file, format="audio/wav")
+        st.caption(f"📄 {uploaded_file.name}  ·  {len(uploaded_file.getvalue())/(1024*1024):.2f} MB")
+        conversation_mode = st.checkbox("Speaker labels (Conversation Mode)", value=True)
+
+        if st.button("Transcribe", type="primary", use_container_width=True):
+            if file_hash != st.session_state.last_processed_file:
+                st.session_state.last_processed_file = file_hash
+                with st.spinner("Processing audio…"):
+                    try:
+                        ext = uploaded_file.name.split(".")[-1]
+                        tmp = f"temp_upload.{ext}"
+                        with open(tmp,"wb") as f: f.write(uploaded_file.getbuffer())
+                        mode = "Conversation" if conversation_mode else "Standard"
+                        ok = do_transcribe(tmp, conversation_mode, mode)
+                        if ok:
+                            st.markdown('<div class="tr-ok">✓ &nbsp;Transcription complete!</div>', unsafe_allow_html=True)
+                        else:
+                            st.markdown('<div class="tr-err">⚠ No speech detected.</div>', unsafe_allow_html=True)
+                    except Exception as e:
+                        st.markdown(f'<div class="tr-err">⚠ {e}</div>', unsafe_allow_html=True)
+                    finally:
+                        try: os.remove(tmp)
+                        except: pass
+            else:
+                st.markdown('<div class="tr-warn">⚠ Already transcribed.</div>', unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# ─── TRANSCRIPTION OUTPUT ────────────────────────────────────
+if st.session_state.transcribed_text:
+    st.markdown("""
+    <div class="tr-section">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      Transcription
     </div>
     """, unsafe_allow_html=True)
 
-    col_mode, col_btn = st.columns([2, 1])
-    with col_mode:
-        conversation_mode = st.checkbox("Speaker Labels (Conversation Mode)", value=True)
-    with col_btn:
-        transcribe_clicked = st.button("✦ Transcribe", type="primary", use_container_width=True)
+    st.markdown(f'<div class="tr-box">{st.session_state.transcribed_text}</div>', unsafe_allow_html=True)
 
-    if transcribe_clicked:
-        if file_hash != st.session_state.last_processed_file:
-            st.session_state.last_processed_file = file_hash
-            with st.spinner("Uploading & transcribing…"):
-                try:
-                    file_ext = uploaded_file.name.split('.')[-1]
-                    temp_file = f"temp_upload.{file_ext}"
-                    with open(temp_file, "wb") as f:
-                        f.write(uploaded_file.getbuffer())
-                    config = aai.TranscriptionConfig(speaker_labels=True, speakers_expected=2)
-                    transcriber = aai.Transcriber(config=config)
-                    transcript = transcriber.transcribe(temp_file)
-                    if transcript.text:
-                        formatted = format_transcript(transcript, conversation_mode)
-                        st.session_state.transcribed_text = formatted
-                        st.session_state.original_text = transcript.text
-                        st.session_state.translated_text = ""
-                        mode = "Conversation" if conversation_mode else "Standard"
-                        add_to_history(formatted, formatted, mode)
-                        st.success("Transcription complete")
-                    else:
-                        st.error("No speech detected — please try again.")
-                except Exception as e:
-                    st.error(f"Error: {str(e)}")
-                finally:
-                    try:
-                        if os.path.exists(temp_file):
-                            os.remove(temp_file)
-                    except:
-                        pass
-        else:
-            st.warning("This file has already been transcribed.")
-
-# ============================================================
-# TRANSCRIPTION OUTPUT
-# ============================================================
-if st.session_state.transcribed_text:
-    st.markdown('<div class="section-label">Transcription</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="text-box">{st.session_state.transcribed_text}</div>', unsafe_allow_html=True)
-
-    col1, col2, col3 = st.columns(3)
-    with col1:
+    # 3 equal-height action buttons — separated from box by margin-top in CSS
+    st.markdown('<div class="action-row">', unsafe_allow_html=True)
+    c1, c2, c3 = st.columns(3)
+    with c1:
         st.download_button(
-            label="↓ Download",
+            label="↓  Download",
             data=st.session_state.transcribed_text,
             file_name=f"transcript_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
-            mime="text/plain",
-            use_container_width=True,
-            key="download_main"
+            mime="text/plain", use_container_width=True, key="dl_main"
         )
-    with col2:
-        if st.button("✕ Clear", key="clear_transcription", use_container_width=True):
+    with c2:
+        if st.button("✕  Clear", key="clear_tr", use_container_width=True, type="secondary"):
             st.session_state.transcribed_text = ""
             st.session_state.original_text = ""
             st.session_state.translated_text = ""
             st.session_state.show_translate = False
             st.rerun()
-    with col3:
-        if st.button("⇄ Translate", key="translate_btn", use_container_width=True):
+    with c3:
+        lbl = "✕  Close Translate" if st.session_state.show_translate else "⇄  Translate"
+        if st.button(lbl, key="tr_toggle", use_container_width=True):
             st.session_state.show_translate = not st.session_state.show_translate
             st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
-# ============================================================
-# TRANSLATION
-# ============================================================
+# ─── TRANSLATION ─────────────────────────────────────────────
 if st.session_state.show_translate and st.session_state.transcribed_text:
-    st.markdown('<div class="section-label">Translation</div>', unsafe_allow_html=True)
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        target_lang = st.selectbox(
-            "Language",
-            ["Hindi", "Gujarati", "Spanish", "French", "German", "Chinese", "Japanese"],
-            label_visibility="collapsed"
-        )
-    with col2:
-        do_translate = st.button("Go", type="primary", use_container_width=True)
-
-    if do_translate:
-        with st.spinner(f"Translating to {target_lang}…"):
+    st.markdown("""
+    <div class="tr-section">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="2" y1="12" x2="22" y2="12"/>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+      </svg>
+      Translate
+    </div>
+    """, unsafe_allow_html=True)
+    col_l, col_b = st.columns([3,1])
+    with col_l:
+        target_lang = st.selectbox("lang", ["Hindi","Gujarati","Spanish","French","German","Chinese","Japanese"], label_visibility="collapsed")
+    with col_b:
+        go = st.button("Go →", type="primary", use_container_width=True)
+    if go:
+        with st.spinner("Translating…"):
             translated = translate_text(st.session_state.transcribed_text, target_lang)
-            if translated:
-                st.session_state.translated_text = translated
-
+            st.session_state.translated_text = translated
     if st.session_state.translated_text:
-        st.markdown(f'<div class="text-box" style="border-color:#2d2317;">{st.session_state.translated_text}</div>', unsafe_allow_html=True)
-        col_a, col_b = st.columns(2)
-        with col_a:
-            st.download_button(
-                label="↓ Download Translation",
-                data=st.session_state.translated_text,
-                file_name=f"translation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
-                mime="text/plain",
-                use_container_width=True,
-                key="dl_translation"
-            )
+        st.markdown(f'<div class="tr-box tr-box-gold">{st.session_state.translated_text}</div>', unsafe_allow_html=True)
+        st.markdown('<div class="spacer-sm"></div>', unsafe_allow_html=True)
+        st.download_button(
+            label="↓  Download Translation",
+            data=st.session_state.translated_text,
+            file_name=f"translation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
+            mime="text/plain", use_container_width=True, key="dl_translation"
+        )
 
-# ============================================================
-# HISTORY — with inline download icon on right side
-# ============================================================
+# ─── HISTORY ─────────────────────────────────────────────────
 if st.session_state.history:
-    st.markdown('<div class="section-label">History</div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="tr-section">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="1 4 1 10 7 10"/>
+        <path d="M3.51 15a9 9 0 1 0 .49-3.78"/>
+      </svg>
+      History
+    </div>
+    """, unsafe_allow_html=True)
 
     for idx, item in enumerate(st.session_state.history):
-        # History card with meta on left, download on right (via Streamlit columns)
-        col_text, col_dl = st.columns([9, 1])
-        with col_text:
+        col_main, col_dl = st.columns([10, 1])
+
+        with col_main:
             st.markdown(f"""
-            <div class="history-item">
-                <div class="history-mode">{item['mode']}</div>
-                <div class="history-time">{item['time']}</div>
-                <div class="history-text">{item['text']}</div>
+            <div class="hist-card" style="margin-bottom:0;">
+              <div class="hist-main">
+                <div class="hist-top">
+                  <span class="hist-badge">{item['mode']}</span>
+                  <span class="hist-time">{item['time']}</span>
+                </div>
+                <div class="hist-preview">{item['text']}</div>
+              </div>
             </div>
             """, unsafe_allow_html=True)
+
         with col_dl:
-            st.markdown("<div style='height:14px'></div>", unsafe_allow_html=True)
+            st.markdown('<div class="hist-dl-col">', unsafe_allow_html=True)
             st.download_button(
                 label="↓",
-                data=item.get('full_text', item['text']),
-                file_name=f"transcript_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{idx}.txt",
+                data=item.get("full_text", item["text"]),
+                file_name=f"transcript_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
                 mime="text/plain",
+                key=f"dl_h_{idx}",
                 use_container_width=True,
-                key=f"dl_hist_{idx}"
             )
+            st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
-    if st.button("✕ Clear All History", use_container_width=True):
+    st.markdown('<div class="spacer-sm"></div>', unsafe_allow_html=True)
+    if st.button("Clear All History", use_container_width=True, type="secondary"):
         st.session_state.history = []
         save_history(st.session_state.history)
         st.rerun()
 
-# ============================================================
-# FOOTER
-# ============================================================
-st.markdown("""
-<div class="vtp-footer">
-    Voice to Text Pro &nbsp;·&nbsp; <strong>AssemblyAI</strong> + <strong>Mistral</strong> &nbsp;·&nbsp; by Nirbhay
-</div>
-""", unsafe_allow_html=True)
+# ─── FOOTER ──────────────────────────────────────────────────
+st.markdown('<div class="tr-hr"></div>', unsafe_allow_html=True)
+st.markdown('<div class="tr-footer">Transcriptr &nbsp;·&nbsp; AssemblyAI + Mistral &nbsp;·&nbsp; <em>by Nirbhay</em></div>', unsafe_allow_html=True)
